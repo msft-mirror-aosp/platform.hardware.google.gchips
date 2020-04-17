@@ -702,7 +702,7 @@ static int set_dataspace(private_handle_t * const hnd, uint64_t usage, int32_t f
 
 	if (csc_supported == -1)
 	{
-		csc_supported = property_get_int32("ro.vendor.cscsupported", 0);
+		csc_supported = property_get_int32("ro.vendor.gpu.dataspace", 0);
 #ifdef GRALLOC_NO_CSC_SUPPORTED
 		csc_supported = 0;
 #endif
