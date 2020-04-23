@@ -1375,7 +1375,7 @@ int mali_gralloc_buffer_allocate(mali_gralloc_module *m, const gralloc_buffer_de
 		}
 
 #if GRALLOC_ARM_NO_EXTERNAL_AFBC == 0
-		int afbc_prop = property_get_int32("ro.vendor.cscsupported", 0);
+		int afbc_prop = property_get_int32("ro.vendor.ddk.set.afbc", 0);
 
 		if (afbc_prop == 1 && hnd->alloc_format & MALI_GRALLOC_INTFMT_AFBC_BASIC)
 		{
