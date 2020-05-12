@@ -32,6 +32,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define MAX_HDR10PLUS_SIZE 1024
+
 typedef enum _ExynosVideoInfoType {
     VIDEO_INFO_TYPE_INVALID         = 0,
     VIDEO_INFO_TYPE_HDR_STATIC      = 0x1 << 0,
