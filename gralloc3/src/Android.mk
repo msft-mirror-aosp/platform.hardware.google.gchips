@@ -61,7 +61,7 @@ MALI_GPU_SUPPORT_AFBC_WIDEBLK?=0
 # GPU support for AFBC 1.2 tiled headers
 MALI_GPU_SUPPORT_AFBC_TILED_HEADERS?=0
 # GPU support for writing AFBC YUV formats
-MALI_GPU_SUPPORT_AFBC_YUV_WRITE?=0
+MALI_GPU_SUPPORT_AFBC_YUV_WRITE?=1
 
 #
 # Software behaviour defines
