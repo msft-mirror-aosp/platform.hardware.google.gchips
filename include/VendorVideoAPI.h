@@ -35,12 +35,13 @@ extern "C" {
 #define MAX_HDR10PLUS_SIZE 1024
 
 typedef enum _ExynosVideoInfoType {
-    VIDEO_INFO_TYPE_INVALID         = 0,
-    VIDEO_INFO_TYPE_HDR_STATIC      = 0x1 << 0,
-    VIDEO_INFO_TYPE_COLOR_ASPECTS   = 0x1 << 1,
-    VIDEO_INFO_TYPE_INTERLACED      = 0x1 << 2,
-    VIDEO_INFO_TYPE_YSUM_DATA       = 0x1 << 3,
-    VIDEO_INFO_TYPE_HDR_DYNAMIC     = 0x1 << 4,
+    VIDEO_INFO_TYPE_INVALID            = 0,
+    VIDEO_INFO_TYPE_HDR_STATIC         = 0x1 << 0,
+    VIDEO_INFO_TYPE_COLOR_ASPECTS      = 0x1 << 1,
+    VIDEO_INFO_TYPE_INTERLACED         = 0x1 << 2,
+    VIDEO_INFO_TYPE_YSUM_DATA          = 0x1 << 3,
+    VIDEO_INFO_TYPE_HDR_DYNAMIC        = 0x1 << 4,
+    VIDEO_INFO_TYPE_CHECK_PIXEL_FORMAT = 0x1 << 5,
 } ExynosVideoInfoType;
 
 typedef struct _ExynosVideoYSUMData {
@@ -129,6 +130,8 @@ typedef struct _ExynosVideoMeta {
     } data;
 
     ExynosHdrDynamicInfo sHdrDynamicInfo;
+
+    int nPixelFormat;
 } ExynosVideoMeta;
 
 int Exynos_parsing_user_data_registered_itu_t_t35(ExynosHdrDynamicInfo *dest, void *src);
