@@ -61,13 +61,15 @@ endif
 include $(CLEAR_VARS)
 
 LOCAL_SHARED_LIBRARIES := liblog libcutils libutils android.hardware.graphics.allocator@2.0 android.hardware.graphics.mapper@2.0 \
-	libsync libhardware libhidlbase libhidltransport
+    libsync libhardware libhidlbase libhidltransport
 
 LOCAL_C_INCLUDES := \
-    $(TOP)/hardware/google/gchips/include
+    $(TOP)/hardware/google/gchips/include \
+    $(TOP)/hardware/google/gchips/gralloc3/include
 
 LOCAL_SRC_FILES := 	\
-	GrallocWrapper.cpp
+    GrallocWrapper.cpp \
+    gralloc_public_interface.cpp
 
 ifeq ($(BOARD_USES_VENDORIMAGE), true)
 LOCAL_PROPRIETARY_MODULE := true
