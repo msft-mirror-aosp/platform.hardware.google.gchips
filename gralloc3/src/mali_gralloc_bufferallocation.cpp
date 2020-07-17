@@ -326,7 +326,7 @@ static void get_pixel_w_h(uint32_t * const width,
 	 * Pixel alignment (width),
 	 * where format stride is stated in pixels.
 	 */
-	int pixel_align_w = 0;
+	int pixel_align_w = 0, pixel_align_h = 0;
 	if (has_cpu_usage && (plane == 0 || !format.planes_contiguous))
 	{
 		pixel_align_w = format.align_w_cpu;
@@ -355,13 +355,27 @@ static void get_pixel_w_h(uint32_t * const width,
 		afbc_tile.height = format.bpp_afbc[plane] > 32 ? 4 * afbc_tile.height : 8 * afbc_tile.height;
 	}
 
+	if (AFBC_WIDEBLK == alloc_type.primary_type && !alloc_type.is_tiled)
+	{
+		/*
+		 * Special case for wide block (32x8) AFBC with linear (non-tiled)
+		 * headers: hardware reads and writes 32x16 blocks so we need to
+		 * pad the body buffer accordingly.
+		 *
+		 * Note that this branch will not be taken for multi-plane AFBC
+		 * since that requires tiled headers.
+		 */
+		pixel_align_h = max(pixel_align_h, 16);
+	}
+
 	ALOGV("Plane[%hhu]: [SUB-SAMPLE] w:%d, h:%d\n", plane, *width, *height);
-	ALOGV("Plane[%hhu]: [PIXEL_ALIGN] w:%d\n", plane, pixel_align_w);
+	ALOGV("Plane[%hhu]: [PIXEL_ALIGN] w:%d, h:%d\n", plane, pixel_align_w, pixel_align_h);
 	ALOGV("Plane[%hhu]: [LINEAR_TILE] w:%" PRIu16 "\n", plane, format.tile_size);
 	ALOGV("Plane[%hhu]: [AFBC_TILE] w:%" PRIu16 ", h:%" PRIu16 "\n", plane, afbc_tile.width, afbc_tile.height);
 
 	*width = GRALLOC_ALIGN(*width, max(1, pixel_align_w, format.tile_size, afbc_tile.width));
-	*height = GRALLOC_ALIGN(*height, max(1, format.tile_size, afbc_tile.height));
+	*height = GRALLOC_ALIGN(*height, max(1, pixel_align_h, format.tile_size, afbc_tile.height));
+
 }
 
 
