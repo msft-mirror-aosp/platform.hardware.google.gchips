@@ -1,5 +1,6 @@
 cc_library_headers {
     name: "google_hal_headers",
+    host_supported: true,
     header_libs: [
         "libaudio_system_headers",
         "libhardware_headers",
