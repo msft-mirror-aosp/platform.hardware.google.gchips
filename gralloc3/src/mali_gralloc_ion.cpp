@@ -362,8 +362,6 @@ static int alloc_from_ion_heap(uint64_t usage, size_t size,
 		*min_pgsz = SZ_4K;
 		break;
 
-	case ION_HEAP_TYPE_SYSTEM_CONTIG:
-	case ION_HEAP_TYPE_CARVEOUT:
 #if GRALLOC_USE_ION_DMA_HEAP
 	case ION_HEAP_TYPE_DMA:
 		*min_pgsz = size;
