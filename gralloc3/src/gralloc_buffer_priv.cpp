@@ -88,12 +88,6 @@ int gralloc_buffer_attr_allocate(private_handle_t *hnd)
 
 	if (hnd->attr_base != MAP_FAILED)
 	{
-		/* The attribute region contains signed integers only.
-		 * The reason for this is because we can set a value less than 0 for
-		 * not-initialized values.
-		 */
-		attr_region *region = (attr_region *)hnd->attr_base;
-
 		memset(hnd->attr_base, 0xff, PAGE_SIZE);
 		munmap(hnd->attr_base, PAGE_SIZE);
 		hnd->attr_base = MAP_FAILED;

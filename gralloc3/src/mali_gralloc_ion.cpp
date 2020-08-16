@@ -502,8 +502,6 @@ static int get_max_buffer_descriptor_index(const gralloc_buffer_descriptor_t *de
  */
 static int open_and_query_ion(void)
 {
-	int ret = -1;
-
 	if (ion_client >= 0)
 	{
 		AWAR("ION device already open");
@@ -668,14 +666,18 @@ static void mali_gralloc_ion_free_internal(buffer_handle_t * const pHandle,
 }
 
 static int allocate_to_fds(buffer_descriptor_t *bufDescriptor, enum ion_heap_type heap_type,
-		uint32_t ion_flags, uint32_t *priv_heap_flag, int *min_pgsz, int* fd0, int* fd1, int* fd2)
+		uint32_t ion_flags, uint32_t *priv_heap_flag, int *min_pgsz, int* fd0, int* fd1, int* fd2, int ion_fd = -1)
 {
 	int fd_arr[3] = {-1, -1, -1};
 	uint64_t usage = bufDescriptor->consumer_usage | bufDescriptor->producer_usage;
 
 	for (int idx = 0; idx < bufDescriptor->fd_count; idx++)
 	{
-		fd_arr[idx] = alloc_from_ion_heap(usage, bufDescriptor->sizes[idx], heap_type, ion_flags, min_pgsz);
+		if (ion_fd != -1 && idx == 0) {
+			fd_arr[idx] = ion_fd;
+		} else {
+			fd_arr[idx] = alloc_from_ion_heap(usage, bufDescriptor->sizes[idx], heap_type, ion_flags, min_pgsz);
+		}
 
 		if (fd_arr[idx] < 0)
 		{
@@ -803,18 +805,23 @@ finish:
  * @param numDescriptors  [in]    Number of descriptors
  * @param pHandle         [out]   Handle for each allocated buffer
  * @param shared_backend  [out]   Shared buffers flag
+ * @param ion_fd          [in]    Optional fd of an allocated ION buffer
  *
  * @return File handle which can be used for allocation, on success
  *         -1, otherwise.
+ *
+ * In the case ion_fd != -1, this functions wraps ion_fd in a buffer_handle_t
+ * instead.
  */
 int mali_gralloc_ion_allocate(const gralloc_buffer_descriptor_t *descriptors,
                               uint32_t numDescriptors, buffer_handle_t *pHandle,
-                              bool *shared_backend)
+                              bool *shared_backend, int ion_fd)
 {
-	static int support_protected = 1;
 	unsigned int priv_heap_flag = 0;
 	enum ion_heap_type heap_type;
+#if GRALLOC_INIT_AFBC == 1
 	unsigned char *cpu_ptr = NULL;
+#endif
 	uint64_t usage;
 	uint32_t i, max_buffer_index = 0;
 	union
@@ -976,7 +983,7 @@ int mali_gralloc_ion_allocate(const gralloc_buffer_descriptor_t *descriptors,
 			if (~usage & GRALLOC1_PRODUCER_USAGE_HFR_MODE)
 			{
 				if (allocate_to_fds(bufDescriptor, heap_type, ion_flags, &priv_heap_flag, &min_pgsz,
-							&fd_arr[0], &fd_arr[1], &fd_arr[2]) < 0)
+					&fd_arr[0], &fd_arr[1], &fd_arr[2], ion_fd) < 0)
 				{
 					AERR("ion_alloc failed from client ( %d )", ion_client);
 
@@ -1042,7 +1049,9 @@ int mali_gralloc_ion_allocate(const gralloc_buffer_descriptor_t *descriptors,
 	for (i = 0; i < numDescriptors; i++)
 	{
 		buffer_descriptor_t *bufDescriptor = (buffer_descriptor_t *)(descriptors[i]);
+#if GRALLOC_INIT_AFBC == 1
 		private_handle_t *hnd = (private_handle_t *)(pHandle[i]);
+#endif
 
 		usage = bufDescriptor->consumer_usage | bufDescriptor->producer_usage;
 
@@ -1183,7 +1192,7 @@ void mali_gralloc_ion_unmap(private_handle_t *hnd)
 {
 	if (hnd->flags & private_handle_t::PRIV_FLAGS_USES_ION)
 	{
-		int ret = 0, fail = 0;
+		int fail = 0;
 
 		for (int idx = 0; idx < hnd->get_num_ion_fds(); idx++)
 		{

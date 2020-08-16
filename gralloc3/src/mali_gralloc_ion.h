@@ -22,8 +22,24 @@
 #include "mali_gralloc_module.h"
 #include "mali_gralloc_bufferdescriptor.h"
 
+/*
+ *  Allocates ION buffers
+ *
+ * @param descriptors     [in]    Buffer request descriptors
+ * @param numDescriptors  [in]    Number of descriptors
+ * @param pHandle         [out]   Handle for each allocated buffer
+ * @param shared_backend  [out]   Shared buffers flag
+ * @param ion_fd          [in]    Optional fd of an allocated ION buffer
+ *
+ * @return File handle which can be used for allocation, on success
+ *         -1, otherwise.
+ *
+ * In the case ion_fd != -1, this functions wraps ion_fd in a buffer_handle_t
+ * instead.
+ */
 int mali_gralloc_ion_allocate(const gralloc_buffer_descriptor_t *descriptors,
-                              uint32_t numDescriptors, buffer_handle_t *pHandle, bool *alloc_from_backing_store);
+                              uint32_t numDescriptors, buffer_handle_t *pHandle,
+                              bool *alloc_from_backing_store, int ion_fd = -1);
 void mali_gralloc_ion_free(private_handle_t * const hnd);
 int mali_gralloc_ion_sync_start(const private_handle_t * const hnd,
                                 const bool read, const bool write);

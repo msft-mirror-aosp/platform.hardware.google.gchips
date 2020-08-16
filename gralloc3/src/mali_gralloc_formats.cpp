@@ -541,7 +541,6 @@ void mali_gralloc_adjust_dimensions(const uint64_t alloc_format,
 {
 	/* Determine producers and consumers. */
 	const uint16_t producers = get_producers(usage);
-	const uint16_t consumers = get_consumers(usage);
 
 	/*
 	 * Video producer requires additional height padding of AFBC buffers (whole
@@ -572,7 +571,6 @@ void mali_gralloc_adjust_dimensions(const uint64_t alloc_format,
 		}
 	}
 
-out:
 	ALOGV("%s: alloc_format=0x%" PRIx64 " usage=0x%" PRIx64
 	      " alloc_width=%u, alloc_height=%u",
 	      __FUNCTION__, alloc_format, usage, *width, *height);
@@ -1019,8 +1017,6 @@ static void get_active_caps(const format_info_t format,
                             uint64_t * const consumer_active_caps,
                             const int buffer_size)
 {
-	const uint64_t producer_caps = (producer_active_caps) ? *producer_active_caps : 0;
-	const uint64_t consumer_caps = (consumer_active_caps) ? *consumer_active_caps : 0;
 	uint64_t producer_mask = ~0;
 	uint64_t consumer_mask = ~0;
 	bool afbc_allowed = false;
@@ -1036,6 +1032,8 @@ static void get_active_caps(const format_info_t format,
 		/* Disable AFBC based on buffer dimensions */
 		afbc_allowed = afbc_allowed && ((buffer_size * 100) / (GRALLOC_DISP_W * GRALLOC_DISP_H)) >= GRALLOC_AFBC_MIN_SIZE;
 	}
+#else
+	GRALLOC_UNUSED(consumers);
 #endif
 	if (!afbc_allowed)
 	{
@@ -1672,7 +1670,6 @@ uint64_t mali_gralloc_select_format(const uint64_t req_format,
 
 		uint64_t producer_active_caps = producer_caps;
 		uint64_t consumer_active_caps = consumer_caps;
-		uint64_t consumer_caps_mask;
 
 		get_active_caps(formats[req_fmt_idx],
 		                producers, consumers,
@@ -1718,42 +1715,3 @@ out:
 
 	return alloc_format;
 }
-
-bool is_exynos_format(uint32_t base_format)
-{
-	switch (base_format)
-	{
-		case HAL_PIXEL_FORMAT_YCrCb_420_SP:
-		case HAL_PIXEL_FORMAT_EXYNOS_YV12_M:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_P:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_P_M:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_TILED:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCrCb_420_SP_M:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCrCb_420_SP_M_FULL:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_S10B:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_S10B:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_P010_M:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_SBWC:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_SBWC:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCrCb_420_SP_M_SBWC:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_10B_SBWC:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCrCb_420_SP_M_10B_SBWC:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_SBWC_L50:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_SBWC_L75:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_SBWC_L50:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_SBWC_L75:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_10B_SBWC_L40:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_10B_SBWC_L60:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_10B_SBWC_L80:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC_L40:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC_L60:
-		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC_L80:
-			return true;
-	}
-
-	return false;
-}
-
