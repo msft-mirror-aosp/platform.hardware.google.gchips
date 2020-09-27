@@ -119,6 +119,7 @@ const format_info_t formats[] = {
 	{ .id = HAL_PIXEL_FORMAT_GOOGLE_NV12_SP,                     .npln = 2, .ncmp = 3, .bps = 8,  .bpp_afbc = { 0, 0, 0 },   .bpp = { 8,  16, 0 }, .hsub = 2, .vsub = 2, .align_w = 64, .align_h =  8, .align_w_cpu = 64,   .tile_size = 1, .has_alpha = false, .is_rgb = false, .is_yuv = true,  .afbc = false,  .linear = true, .yuv_transform = false, .flex = true,  .planes_contiguous = true },
 	{ .id = HAL_PIXEL_FORMAT_GOOGLE_NV12_SP_10B,                 .npln = 2, .ncmp = 3, .bps = 10, .bpp_afbc = { 0, 0, 0 },   .bpp = { 16, 32, 0 }, .hsub = 2, .vsub = 2, .align_w = 64, .align_h =  8, .align_w_cpu = 64,   .tile_size = 1, .has_alpha = false, .is_rgb = false, .is_yuv = true,  .afbc = false,  .linear = true, .yuv_transform = false, .flex = true,  .planes_contiguous = true },
 	{ .id = HAL_PIXEL_FORMAT_GOOGLE_R_8,                         .npln = 1, .ncmp = 1, .bps = 8,  .bpp_afbc = { 8, 0, 0 },   .bpp = { 8, 0, 0 },   .hsub = 0, .vsub = 0, .align_w = 16, .align_h = 16, .align_w_cpu = 16,   .tile_size = 1, .has_alpha = false, .is_rgb = true,  .is_yuv = false, .afbc = true,   .linear = true, .yuv_transform = false, .flex = true,  .planes_contiguous = false },
+	{ .id = HAL_PIXEL_FORMAT_GOOGLE_RG_88,                       .npln = 1, .ncmp = 2, .bps = 8,  .bpp_afbc = { 16, 0, 0 },  .bpp = { 16, 0, 0 },  .hsub = 0, .vsub = 0, .align_w = 16, .align_h = 16, .align_w_cpu = 16,   .tile_size = 1, .has_alpha = false, .is_rgb = true,  .is_yuv = false, .afbc = true,   .linear = true, .yuv_transform = false, .flex = true,  .planes_contiguous = false },
 
 };
 
@@ -219,6 +220,7 @@ const format_ip_support_t formats_ip_support[] = {
 	{ .id = HAL_PIXEL_FORMAT_GOOGLE_NV12_SP,                     .cpu_wr = F_LIN,  .cpu_rd = F_LIN,   .gpu_wr = F_LIN         , .gpu_rd = F_LIN         , .dpu_wr = F_LIN,  .dpu_rd = F_LIN,               .dpu_aeu_wr = F_NONE, .vpu_wr = F_LIN,  .vpu_rd = F_LIN},
 	{ .id = HAL_PIXEL_FORMAT_GOOGLE_NV12_SP_10B,                 .cpu_wr = F_LIN,  .cpu_rd = F_LIN,   .gpu_wr = F_LIN         , .gpu_rd = F_LIN         , .dpu_wr = F_LIN,  .dpu_rd = F_LIN,               .dpu_aeu_wr = F_NONE, .vpu_wr = F_LIN,  .vpu_rd = F_LIN},
 	{ .id = HAL_PIXEL_FORMAT_GOOGLE_R_8,                         .cpu_wr = F_LIN,  .cpu_rd = F_LIN,   .gpu_wr = F_LIN | F_AFBC, .gpu_rd = F_LIN | F_AFBC, .dpu_wr = F_NONE, .dpu_rd = F_NONE,              .dpu_aeu_wr = F_NONE, .vpu_wr = F_NONE, .vpu_rd = F_NONE},
+	{ .id = HAL_PIXEL_FORMAT_GOOGLE_RG_88,                       .cpu_wr = F_LIN,  .cpu_rd = F_LIN,   .gpu_wr = F_LIN | F_AFBC, .gpu_rd = F_LIN | F_AFBC, .dpu_wr = F_NONE, .dpu_rd = F_NONE,              .dpu_aeu_wr = F_NONE, .vpu_wr = F_NONE, .vpu_rd = F_NONE},
 };
 
 const size_t num_ip_formats = sizeof(formats_ip_support)/sizeof(formats_ip_support[0]);
@@ -303,7 +305,8 @@ static const hal_int_fmt hal_to_internal_format[] =
 	{ HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC_L80,  false, HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC_L80  },
 	{ HAL_PIXEL_FORMAT_GOOGLE_NV12_SP,                     true,  HAL_PIXEL_FORMAT_GOOGLE_NV12_SP                     },
 	{ HAL_PIXEL_FORMAT_GOOGLE_NV12_SP_10B,                 true,  HAL_PIXEL_FORMAT_GOOGLE_NV12_SP_10B                 },
-	{ HAL_PIXEL_FORMAT_GOOGLE_R_8,                         true,  HAL_PIXEL_FORMAT_GOOGLE_R_8                         },
+	{ HAL_PIXEL_FORMAT_GOOGLE_R_8,                         false,  HAL_PIXEL_FORMAT_GOOGLE_R_8                        },
+	{ HAL_PIXEL_FORMAT_GOOGLE_RG_88,                       false,  HAL_PIXEL_FORMAT_GOOGLE_RG_88                      },
 };
 
 const size_t num_hal_formats = sizeof(hal_to_internal_format)/sizeof(hal_to_internal_format[0]);
