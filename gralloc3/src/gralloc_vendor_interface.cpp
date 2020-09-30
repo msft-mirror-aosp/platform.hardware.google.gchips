@@ -118,8 +118,11 @@ buffer_handle_t createNativeHandle(const Descriptor &descriptor) {
     if (allocResult < 0) {
         return nullptr;
     }
+
     private_handle_t *private_handle = const_cast<private_handle_t *>(
         static_cast<const private_handle_t *>(tmp_buffer));
+    private_handle->offset = private_handle->plane_info[0].offset = descriptor.offset;
+
     int err = gralloc_buffer_attr_allocate(private_handle);
     if (err) {
         ALOGE("createNativeHandle failed, gralloc_buffer_attr_allocate returned %d.", err);
