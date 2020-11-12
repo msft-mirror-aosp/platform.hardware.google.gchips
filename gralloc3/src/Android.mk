@@ -52,6 +52,18 @@ GRALLOC_MAPPER?=0
 # These defines are used in case runtime detection does not find the
 # user-space driver to read out hardware capabilities
 
+ifeq ($(USE_SWIFTSHADER),true)
+# GPU support for AFBC 1.0
+MALI_GPU_SUPPORT_AFBC_BASIC?=0
+# GPU support for AFBC 1.1 block split
+MALI_GPU_SUPPORT_AFBC_SPLITBLK?=0
+# GPU support for AFBC 1.1 wide block
+MALI_GPU_SUPPORT_AFBC_WIDEBLK?=0
+# GPU support for AFBC 1.2 tiled headers
+MALI_GPU_SUPPORT_AFBC_TILED_HEADERS?=0
+# GPU support for writing AFBC YUV formats
+MALI_GPU_SUPPORT_AFBC_YUV_WRITE?=0
+else # !USE_SWIFTSHADER
 # GPU support for AFBC 1.0
 MALI_GPU_SUPPORT_AFBC_BASIC?=1
 # GPU support for AFBC 1.1 block split
@@ -62,6 +74,7 @@ MALI_GPU_SUPPORT_AFBC_WIDEBLK?=1
 MALI_GPU_SUPPORT_AFBC_TILED_HEADERS?=0
 # GPU support for writing AFBC YUV formats
 MALI_GPU_SUPPORT_AFBC_YUV_WRITE?=1
+endif # USE_SWIFTSHADER
 
 #
 # Software behaviour defines
