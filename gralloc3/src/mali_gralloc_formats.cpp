@@ -1316,7 +1316,8 @@ static uint64_t get_best_format(const uint32_t req_base_format,
 		{
 			fmt_props fmt = {0, 0, 0};
 			fmt.base_format = formats[i].id;
-			ALOGV("Compatible: Base-format: 0x%" PRIx32, fmt.base_format);
+			ALOGV("Compatible: Base-format: %s 0x%" PRIx32,
+			      format_name(fmt.base_format), fmt.base_format);
 			f_compat.push_back(fmt);
 		}
 	}
@@ -1345,8 +1346,8 @@ static uint64_t get_best_format(const uint32_t req_base_format,
 		if (supported)
 		{
 			num_supported_formats++;
-			ALOGV("Supported: Base-format: 0x%" PRIx32 ", Modifiers: 0x%" PRIx64 ", Flags: 0x%" PRIx16,
-			      fmt.base_format, fmt.format_ext, fmt.f_flags);
+			ALOGV("Supported: Base-format: %s 0x%" PRIx32 ", Modifiers: 0x%" PRIx64 ", Flags: 0x%" PRIx16,
+			      format_name(fmt.base_format), fmt.base_format, fmt.format_ext, fmt.f_flags);
 
 			/* Calculate the number of modifier bits enabled for a supported format
 			 * so as to identify best (highest modifier bits enabled) format among them
@@ -1580,8 +1581,8 @@ uint32_t get_base_format(const uint64_t req_format,
 		}
 	}
 
-	ALOGV("[%s] req_format(%#x) base_format(%#x) usage(%#" PRIx64 ")\n",
-			__FUNCTION__, (uint32_t)req_format, base_format, usage);
+	ALOGV("[%s] req_format(%s %#x) base_format(%s %#x) usage(%#" PRIx64 ")\n",
+			__FUNCTION__, format_name(req_format), (uint32_t)req_format, format_name(base_format), base_format, usage);
 
 	/* Obtain a valid base format, optionally mapped to internal. Flex formats
 	 * are always mapped to internal base format.
@@ -1621,9 +1622,9 @@ uint64_t mali_gralloc_select_format(const uint64_t req_format,
 	if (req_base_format == MALI_GRALLOC_FORMAT_INTERNAL_UNDEFINED ||
 	    req_fmt_idx == -1)
 	{
-		ALOGE("Invalid base format! req_base_format = 0x%" PRIx32
-		      ", req_format = 0x%" PRIx64 ", type = 0x%" PRIx32,
-		      req_base_format, req_format, type);
+		ALOGE("Invalid base format! req_base_format = %s 0x%" PRIx32
+		      ", req_format = %s 0x%" PRIx64 ", type = 0x%" PRIx32,
+		      format_name(req_base_format), req_base_format, format_name(req_format), req_format, type);
 		goto out;
 	}
 
@@ -1729,9 +1730,10 @@ out:
 		*internal_format |= (alloc_format & MALI_GRALLOC_INTFMT_EXT_MASK);
 	}
 
-	ALOGV("mali_gralloc_select_format: req_format=0x%08" PRIx64 ", usage=0x%" PRIx64
-	      ", req_base_format=0x%" PRIx32 ", alloc_format=0x%" PRIx64 ", internal_format=0x%" PRIx64,
-	      req_format, usage, req_base_format, alloc_format, *internal_format);
+	ALOGV("mali_gralloc_select_format: req_format=%s 0x%08" PRIx64 ", usage=0x%" PRIx64
+	      ", req_base_format=%s 0x%" PRIx32 ", alloc_format=%s 0x%" PRIx64 ", internal_format=%s 0x%" PRIx64,
+	      format_name(req_format), req_format, usage, format_name(req_base_format), req_base_format,
+	      format_name(alloc_format), alloc_format, format_name(*internal_format), *internal_format);
 
 	return alloc_format;
 }

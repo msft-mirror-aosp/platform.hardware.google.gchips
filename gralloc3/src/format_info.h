@@ -67,6 +67,7 @@ typedef struct
 	bool yuv_transform;             /* Supports AFBC YUV transform: 3+ channel RGB (strict R-G-B-? order) with less than 12-bit per sample. */
 	bool flex;                      /* Linear version of format can be represented as flex. */
 	bool planes_contiguous;         /* True if all planes in format are contiguous in memory. Has no effect on non-planar formats */
+	const char *name;               /* Human-readable name. */
 } format_info_t;
 
 typedef struct
@@ -94,5 +95,7 @@ extern int32_t get_format_index(const uint32_t base_format);
 extern int32_t get_ip_format_index(const uint32_t base_format);
 extern uint32_t get_internal_format(const uint32_t base_format, const bool map_to_internal);
 extern bool sanitize_formats(void);
+
+extern const char *format_name(const uint32_t base_format);
 
 #endif
