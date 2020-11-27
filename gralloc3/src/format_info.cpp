@@ -556,7 +556,7 @@ bool sanitize_formats(void)
 
 const char *format_name(uint32_t base_format) {
 	static std::once_flag name_map_flag;
-	typedef std::unordered_map<uint32_t, const char*> NameMap;
+	using NameMap = std::unordered_map<uint32_t, const char*>;
 	static NameMap name_map;
 
 	std::call_once(name_map_flag, []() {
