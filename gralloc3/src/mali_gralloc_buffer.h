@@ -25,6 +25,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <cutils/native_handle.h>
+#include <log/log.h>
 #include <string.h>
 //#include <linux/ion.h>
 
@@ -407,7 +408,7 @@ struct private_handle_t
 
 	void dump(const char *str) const
 	{
-		AINF("[%s] "
+		ALOGI("[%s] "
 				"fd(%d %d %d %d) "
 				"flags(%d) "
 				"wh(%d %d) "

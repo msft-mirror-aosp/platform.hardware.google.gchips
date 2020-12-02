@@ -453,7 +453,6 @@ static void update_yv12_stride(int8_t plane,
 }
 
 
-
 /*
  * Calculate allocation size.
  *
@@ -551,6 +550,7 @@ static void calc_allocation_size(const int width,
 				                   &plane_info[plane].byte_stride);
 			}
 			*/
+			GRALLOC_UNUSED(update_yv12_stride);
 		}
 		ALOGV("Byte stride: %d", plane_info[plane].byte_stride);
 
@@ -874,8 +874,6 @@ out:
 
 static int prepare_descriptor_exynos_formats(buffer_descriptor_t *bufDescriptor)
 {
-	size_t sizes[3] = {0, 0, 0};
-
 	size_t luma_size=0, chroma_size=0, ext_size=256;
 	int fd_count = 1;
 	int stride = 0, byte_stride = 0;
@@ -1183,7 +1181,6 @@ int mali_gralloc_derive_format_and_size(mali_gralloc_module *m,
 {
 	GRALLOC_UNUSED(m);
 	alloc_type_t alloc_type;
-	int err;
 	static bool warn_about_mutual_exclusive = true;
 
 	int alloc_width = bufDescriptor->width;

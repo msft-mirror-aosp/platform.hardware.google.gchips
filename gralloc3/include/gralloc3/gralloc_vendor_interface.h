@@ -31,14 +31,13 @@ struct Descriptor;
 Descriptor *createDescriptor();
 void deleteDescriptor(Descriptor *descriptor);
 
-void setFd(Descriptor &descriptor, int fd);
-void setSize(Descriptor &descriptor, int size);
 void setProducerUsage(Descriptor &descriptor, uint64_t usage);
 void setConsumerUsage(Descriptor &descriptor, uint64_t usage);
-void setOffset(Descriptor &descriptor, off_t offset);
-void setStride(Descriptor &descriptor, int stride);
+void setPlaneCount(Descriptor &descriptor, int count);
+void setPlane(Descriptor &descriptor, int index, int fd, size_t size, off_t offset, int stride_byte);
 void setWidth(Descriptor &descriptor, int width);
 void setHeight(Descriptor &descriptor, int height);
+void setStridePixel(Descriptor &descriptor, int stride_pixel);
 void setFormat(Descriptor &descriptor, int format);
 
 buffer_handle_t createNativeHandle(const Descriptor &descriptor);

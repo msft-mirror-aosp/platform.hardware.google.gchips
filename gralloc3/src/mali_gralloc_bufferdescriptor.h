@@ -83,7 +83,7 @@ typedef struct buffer_descriptor
 
 	void dump() const
 	{
-		ALOGE("buffer_descriptor: "
+		ALOGI("buffer_descriptor: "
 				"wh(%u %u) "
 				"usage_pc(0x%" PRIx64 " 0x%" PRIx64 ") "
 				"hal_format(0x%" PRIx64 ") "

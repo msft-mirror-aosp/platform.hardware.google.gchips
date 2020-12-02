@@ -50,6 +50,8 @@
 #include <hardware/exynos/dmabuf_container.h>
 #include <linux/ion.h>
 
+#include <array>
+
 #define INIT_ZERO(obj) (memset(&(obj), 0, sizeof((obj))))
 
 #define HEAP_MASK_FROM_ID(id) (1 << id)
@@ -143,10 +145,61 @@ static void set_ion_flags(enum ion_heap_type heap_type, uint64_t usage,
 	}
 }
 
+static unsigned int select_faceauth_heap_mask(uint64_t usage)
+{
+	struct HeapSpecifier
+	{
+		uint64_t      usage_bits; // exact match required
+		unsigned int  mask;
+	};
+
+	static constexpr std::array<HeapSpecifier, 5> faceauth_heaps =
+	{{
+		{ // isp_image_heap
+			GRALLOC_USAGE_PROTECTED | GRALLOC_USAGE_HW_CAMERA_WRITE | GS101_GRALLOC_USAGE_TPU_INPUT,
+			EXYNOS_ION_HEAP_FA_IMG_MASK
+		},
+		{ // isp_internal_heap
+			GRALLOC_USAGE_PROTECTED | GRALLOC_USAGE_HW_CAMERA_WRITE | GRALLOC_USAGE_HW_CAMERA_READ,
+			EXYNOS_ION_HEAP_FA_RAWIMG_MASK
+		},
+		{ // isp_preview_heap
+			GRALLOC_USAGE_PROTECTED | GRALLOC_USAGE_HW_CAMERA_WRITE | GRALLOC_USAGE_HW_COMPOSER,
+			EXYNOS_ION_HEAP_FA_PREV_MASK
+		},
+		{ // ml_model_heap
+			GRALLOC_USAGE_PROTECTED | GS101_GRALLOC_USAGE_TPU_INPUT,
+			EXYNOS_ION_HEAP_FA_MODEL_MASK
+		},
+		{ // tpu_heap
+			GRALLOC_USAGE_PROTECTED | GS101_GRALLOC_USAGE_TPU_OUTPUT | GS101_GRALLOC_USAGE_TPU_INPUT,
+			EXYNOS_ION_HEAP_FA_TPU_MASK
+		}
+	}};
+
+	for (const HeapSpecifier &heap : faceauth_heaps)
+	{
+		if (usage == heap.usage_bits)
+		{
+			ALOGV("Using FaceAuth heap mask 0x%x for usage 0x%" PRIx64 "\n",
+			      heap.mask, usage);
+			return heap.mask;
+		}
+	}
+
+	return 0;
+}
 
 static unsigned int select_heap_mask(uint64_t usage)
 {
+	if (unsigned int faceauth_heap_mask = select_faceauth_heap_mask(usage);
+	    faceauth_heap_mask != 0)
+	{
+		return faceauth_heap_mask;
+	}
+
 	unsigned int heap_mask;
+
 	if (usage & GRALLOC1_PRODUCER_USAGE_PROTECTED)
 	{
 		if (usage & GRALLOC1_PRODUCER_USAGE_PRIVATE_NONSECURE)

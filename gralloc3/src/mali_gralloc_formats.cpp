@@ -62,12 +62,14 @@ static bool runtime_caps_read = false;
 #define MALI_GRALLOC_PRODUCER_DPU_AEU ((uint16_t)1 << 3)
 #define MALI_GRALLOC_PRODUCER_VPU     ((uint16_t)1 << 4)
 #define MALI_GRALLOC_PRODUCER_CAM     ((uint16_t)1 << 5)
+#define MALI_GRALLOC_PRODUCER_TPU     ((uint16_t)1 << 6)
 
 #define MALI_GRALLOC_CONSUMER_CPU     ((uint16_t)1 << 0)
 #define MALI_GRALLOC_CONSUMER_GPU     ((uint16_t)1 << 1)
 #define MALI_GRALLOC_CONSUMER_DPU     ((uint16_t)1 << 2)
 #define MALI_GRALLOC_CONSUMER_VPU     ((uint16_t)1 << 3)
 #define MALI_GRALLOC_CONSUMER_CAM     ((uint16_t)1 << 5)
+#define MALI_GRALLOC_CONSUMER_TPU     ((uint16_t)1 << 6)
 
 typedef struct
 {
@@ -276,7 +278,12 @@ static uint16_t get_consumers(uint64_t usage)
 {
 	uint16_t consumers = 0;
 
-	/* Private usage is not applicable to consumer derivation */
+	if (usage & GS101_GRALLOC_USAGE_TPU_INPUT)
+	{
+		consumers |= MALI_GRALLOC_CONSUMER_TPU;
+	}
+
+	/* Other private usages are not applicable to consumer derivation */
 	usage &= ~GRALLOC_USAGE_PRIVATE_MASK;
 
 	get_ip_capabilities();
@@ -338,7 +345,6 @@ static uint16_t get_consumers(uint64_t usage)
 		{
 			consumers |= MALI_GRALLOC_CONSUMER_DPU;
 		}
-
 	}
 
 	return consumers;
@@ -382,7 +388,12 @@ static uint16_t get_producers(uint64_t usage)
 {
 	uint16_t producers = 0;
 
-	/* Private usage is not applicable to producer derivation */
+	if (usage & GS101_GRALLOC_USAGE_TPU_OUTPUT)
+	{
+		producers |= MALI_GRALLOC_PRODUCER_TPU;
+	}
+
+	/* Other private usages are not applicable to producer derivation */
 	usage &= ~GRALLOC_USAGE_PRIVATE_MASK;
 
 	get_ip_capabilities();
@@ -454,7 +465,8 @@ static uint64_t get_consumer_caps(const uint16_t consumers)
 	/* Consumers can't write */
 	consumer_caps &= ~MALI_GRALLOC_FORMAT_CAPABILITY_AFBC_YUV_WRITE;
 
-	if (consumers & MALI_GRALLOC_CONSUMER_CPU)
+	if ((consumers & MALI_GRALLOC_CONSUMER_CPU) ||
+	    (consumers & MALI_GRALLOC_CONSUMER_TPU))
 	{
 		consumer_caps &= cpu_runtime_caps.caps_mask;
 	}
@@ -502,7 +514,8 @@ static uint64_t get_producer_caps(const uint16_t producers)
 	/* Producers can't read */
 	producer_caps &= ~MALI_GRALLOC_FORMAT_CAPABILITY_AFBC_YUV_READ;
 
-	if (producers & MALI_GRALLOC_PRODUCER_CPU)
+	if ((producers & MALI_GRALLOC_PRODUCER_CPU) ||
+	    (producers & MALI_GRALLOC_PRODUCER_TPU))
 	{
 		producer_caps &= cpu_runtime_caps.caps_mask;
 	}
@@ -619,7 +632,8 @@ static uint16_t ip_supports_base_format(const uint16_t producers,
 	uint32_t support = ~0;
 
 	/* Determine producer support for base format. */
-	if (producers & MALI_GRALLOC_PRODUCER_CPU)
+	if ((producers & MALI_GRALLOC_PRODUCER_CPU) ||
+	    (producers & MALI_GRALLOC_PRODUCER_TPU))
 	{
 		support &= format->cpu_wr;
 	}
@@ -646,7 +660,8 @@ static uint16_t ip_supports_base_format(const uint16_t producers,
 	}
 
 	/* Determine producer support for base format. */
-	if (consumers & MALI_GRALLOC_CONSUMER_CPU)
+	if ((consumers & MALI_GRALLOC_CONSUMER_CPU) ||
+	    (producers & MALI_GRALLOC_PRODUCER_TPU))
 	{
 		support &= format->cpu_rd;
 	}
