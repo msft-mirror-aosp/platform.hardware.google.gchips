@@ -872,6 +872,32 @@ out:
 	return rval;
 }
 
+/*
+ * Compute SBWC buffer geometry for a buffer containing packed SBWC YUV data
+ * with bits per pixel bpp, width w, and height h.
+ * Returns a pair of { luma size, chroma size }.
+ */
+template <int bpp>
+static std::pair<size_t, size_t> sbwc_sizes(int w, int h) {
+	static_assert(bpp == 8 || bpp == 10, "Unexpected bit width");
+
+	const size_t luma_body_size = (bpp == 8) ?
+		SBWC_8B_Y_SIZE(w, h) : SBWC_10B_Y_SIZE(w, h);
+	const size_t luma_header_size = (bpp == 8) ?
+		SBWC_8B_Y_HEADER_SIZE(w, h) : SBWC_10B_Y_HEADER_SIZE(w, h);
+
+	const size_t chroma_body_size = (bpp == 8) ?
+		SBWC_8B_CBCR_SIZE(w, h) : SBWC_10B_CBCR_SIZE(w, h);
+	const size_t chroma_header_size = (bpp == 8) ?
+		SBWC_8B_CBCR_HEADER_SIZE(w, h) : SBWC_10B_CBCR_HEADER_SIZE(w, h);
+
+	ALOGV("SBWC luma body size 0x%zx, header size 0x%zx", luma_body_size, luma_header_size);
+	ALOGV("SBWC chroma body size 0x%zx, header size 0x%zx", chroma_body_size, chroma_header_size);
+
+	return { luma_body_size + luma_header_size,
+	         chroma_body_size + chroma_header_size };
+}
+
 static int prepare_descriptor_exynos_formats(buffer_descriptor_t *bufDescriptor)
 {
 	size_t luma_size=0, chroma_size=0, ext_size=256;
@@ -903,9 +929,7 @@ static int prepare_descriptor_exynos_formats(buffer_descriptor_t *bufDescriptor)
 		case HAL_PIXEL_FORMAT_EXYNOS_YCrCb_420_SP_M_SBWC:
 		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_SBWC:
 			{
-				luma_size = (SBWC_8B_Y_SIZE(w, h) + SBWC_8B_Y_HEADER_SIZE(w, h));
-				chroma_size = (SBWC_8B_CBCR_SIZE(w, h) + SBWC_8B_CBCR_HEADER_SIZE(w, h));
-
+				std::tie(luma_size, chroma_size) = sbwc_sizes<8>(w, h);
 				byte_stride = SBWC_8B_STRIDE(w);
 				stride = GRALLOC_ALIGN(w, 32);
 				luma_vstride = __ALIGN_UP(h, 8);
@@ -916,9 +940,7 @@ static int prepare_descriptor_exynos_formats(buffer_descriptor_t *bufDescriptor)
 		case HAL_PIXEL_FORMAT_EXYNOS_YCrCb_420_SP_M_10B_SBWC:
 		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_10B_SBWC:
 			{
-				luma_size = (SBWC_10B_Y_SIZE(w, h) + SBWC_10B_Y_HEADER_SIZE(w, h));
-				chroma_size = (SBWC_10B_CBCR_SIZE(w, h) + SBWC_10B_CBCR_HEADER_SIZE(w, h));
-
+				std::tie(luma_size, chroma_size) = sbwc_sizes<10>(w, h);
 				byte_stride = SBWC_10B_STRIDE(w);
 				stride = GRALLOC_ALIGN(w, 32);
 				luma_vstride = __ALIGN_UP(h, 8);
