@@ -106,8 +106,8 @@ GRALLOC_INIT_AFBC:=1
 endif
 
 # Minimum buffer dimensions in pixels when buffer will use AFBC
-GRALLOC_DISP_W?=1080
-GRALLOC_DISP_H?=1920
+GRALLOC_DISP_W?=0
+GRALLOC_DISP_H?=0
 GRALLOC_AFBC_MIN_SIZE?=75
 
 ifdef BOARD_GRALLOC_AFBC_DISP_W
