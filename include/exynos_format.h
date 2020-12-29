@@ -68,6 +68,9 @@ enum {
     /* 10-bit format (2 fd, 10bit, 2x byte) custom formats */
     HAL_PIXEL_FORMAT_EXYNOS_YCbCr_P010_M        = 0x127,
 
+    /* YUV 4:2:2 planar, Y/Cb/Cr */
+    HAL_PIXEL_FORMAT_EXYNOS_YCbCr_422_P         = 0x128,
+
     /* SBWC format */
     HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_SBWC = 0x130,
     HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_SBWC  = 0x131,
