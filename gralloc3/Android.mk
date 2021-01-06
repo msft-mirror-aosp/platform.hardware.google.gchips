@@ -79,7 +79,8 @@ LOCAL_HEADER_LIBRARIES := libnativebase_headers
 
 LOCAL_C_INCLUDES := \
     $(TOP)/hardware/google/gchips/include \
-    $(TOP)/hardware/google/gchips/gralloc3/include
+    $(TOP)/hardware/google/gchips/gralloc3/include \
+    $(TARGET_BOARD_KERNEL_HEADERS)
 
 LOCAL_SRC_FILES := \
     GrallocWrapper.cpp \

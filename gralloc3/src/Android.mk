@@ -154,8 +154,14 @@ $(error GRALLOC_USE_ION_DMA_HEAP and GRALLOC_USE_ION_COMPOUND_PAGE_HEAP can't be
 endif
 endif
 
+ifeq (,$(wildcard $(TARGET_BOARD_KERNEL_HEADERS)/video/mfc_macros.h))
+# b/175341085
+$(warning "Couldn't find video/mfc_macros in UAPI, using local_mfc_macros.h")
+endif
+
 LOCAL_C_INCLUDES := $(MALI_LOCAL_PATH) $(MALI_DDK_INCLUDES) \
-    $(TOP)/hardware/google/gchips/include
+    $(TOP)/hardware/google/gchips/include \
+    $(TARGET_BOARD_KERNEL_HEADERS)
 
 # General compilation flags
 LOCAL_CFLAGS := -ldl -Werror -DLOG_TAG=\"gralloc\" -DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
