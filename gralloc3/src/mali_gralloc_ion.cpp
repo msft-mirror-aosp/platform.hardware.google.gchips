@@ -142,6 +142,11 @@ static void set_ion_flags(enum ion_heap_type heap_type, uint64_t usage,
 			*ion_flags |= ION_FLAG_PROTECTED;
 		}
 #endif
+		/* Sensor direct channels require uncached allocations. */
+		if (usage & GRALLOC_USAGE_SENSOR_DIRECT_DATA)
+		{
+			*ion_flags &= ~ION_FLAG_CACHED;
+		}
 	}
 }
 
