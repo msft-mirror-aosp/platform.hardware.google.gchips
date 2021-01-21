@@ -1361,7 +1361,8 @@ uint32_t get_base_format(const uint64_t req_format,
 		}
 		else if ((usage & GRALLOC_USAGE_HW_CAMERA_READ) && (usage & GRALLOC_USAGE_HW_CAMERA_WRITE))
 		{
-			base_format = HAL_PIXEL_FORMAT_YCbCr_422_I; // YUYV
+			// Camera IMPLEMENTATION_DEFINED format output maps to NV21.
+			base_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
 		}
 		else
 		{
