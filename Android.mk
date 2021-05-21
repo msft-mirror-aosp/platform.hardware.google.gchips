@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ifneq ($(filter gs101,$(TARGET_BOARD_PLATFORM)),)
+ifneq ($(filter gs201 gs101,$(TARGET_BOARD_PLATFORM)),)
 
 common_hal_dirs := \
 	libexynosutils \
