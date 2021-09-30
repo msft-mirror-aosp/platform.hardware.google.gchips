@@ -61,7 +61,6 @@ arm_gralloc_cc_defaults {
 	vendor: true,
 	proprietary: true,
 	cflags: [
-		"-ldl",
 		"-Wundef",
 		"-Werror",
 		"-DGRALLOC_LIBRARY_BUILD=1",
