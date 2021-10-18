@@ -1150,8 +1150,8 @@ int mali_gralloc_buffer_free(buffer_handle_t pHandle)
 		return -1;
 	}
 
-	mali_gralloc_ion_free(hnd);
 	gralloc_shared_memory_free(hnd);
+	mali_gralloc_ion_free(hnd);
 
 	return 0;
 }
