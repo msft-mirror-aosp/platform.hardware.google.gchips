@@ -1118,8 +1118,6 @@ int mali_gralloc_buffer_allocate(const gralloc_buffer_descriptor_t *descriptors,
 	{
 		private_handle_t *hnd = (private_handle_t *)pHandle[i];
 
-		mali_gralloc_dump_buffer_add(hnd);
-
 		if (shared)
 		{
 			/*each buffer will share the same backing store id.*/
