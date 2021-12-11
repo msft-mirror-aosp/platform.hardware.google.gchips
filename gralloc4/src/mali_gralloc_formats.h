@@ -23,6 +23,8 @@
 
 #include "mali_gralloc_log.h"
 
+#include <aidl/android/hardware/graphics/common/PixelFormat.h>
+
 /* Internal formats are represented in gralloc as a 64bit identifier
  * where the 32 lower bits are a base format and the 32 upper bits are modifiers.
  *
@@ -121,6 +123,8 @@ typedef enum
 	MALI_GRALLOC_FORMAT_INTERNAL_YUV444_10BIT_I,
 
 	/* Add more internal formats here. */
+	MALI_GRALLOC_FORMAT_INTERNAL_R_8 =
+		static_cast<int>(aidl::android::hardware::graphics::common::PixelFormat::R_8),
 
 	/* These are legacy 0.3 gralloc formats used only by the wrap/unwrap macros. */
 	MALI_GRALLOC_FORMAT_INTERNAL_YV12_WRAP,

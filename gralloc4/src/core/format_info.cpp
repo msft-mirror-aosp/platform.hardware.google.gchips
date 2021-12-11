@@ -291,6 +291,7 @@ static const hal_int_fmt hal_to_internal_format[] =
 	{ HAL_PIXEL_FORMAT_GOOGLE_NV12_SP_10B,  true, HAL_PIXEL_FORMAT_GOOGLE_NV12_SP_10B },
 	{ HAL_PIXEL_FORMAT_GOOGLE_R_8,          true, HAL_PIXEL_FORMAT_GOOGLE_R_8 },
 	{ HAL_PIXEL_FORMAT_GOOGLE_RG_88,        true, HAL_PIXEL_FORMAT_GOOGLE_RG_88 },
+	{ MALI_GRALLOC_FORMAT_INTERNAL_R_8,    false, HAL_PIXEL_FORMAT_GOOGLE_R_8 },
 };
 
 const size_t num_hal_formats = sizeof(hal_to_internal_format)/sizeof(hal_to_internal_format[0]);
