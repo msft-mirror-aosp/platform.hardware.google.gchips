@@ -1,9 +1,5 @@
 soong_namespace {
-    imports: [
-        "hardware/google/graphics/common",
-        "hardware/google/gchips/gralloc4",
-        "hardware/google/gchips/GrallocHAL",
-    ]
+    imports: ["hardware/google/graphics/common"]
 }
 
 package {
