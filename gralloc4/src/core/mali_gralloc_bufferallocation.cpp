@@ -535,6 +535,7 @@ static void calc_allocation_size(const int width,
                                  const bool has_cpu_usage,
                                  const bool has_hw_usage,
                                  const bool has_gpu_usage,
+                                 const bool has_camera_usage,
                                  int * const pixel_stride,
                                  uint64_t * const size,
                                  plane_info_t plane_info[MAX_PLANES])
@@ -606,15 +607,17 @@ static void calc_allocation_size(const int width,
 
 			uint32_t cpu_align = 0;
 
+			if (!(has_camera_usage && !has_cpu_usage && format.id == MALI_GRALLOC_FORMAT_INTERNAL_RAW10)) {
 #if CAN_SKIP_CPU_ALIGN == 1
-			if (has_cpu_usage)
+				if (has_cpu_usage)
 #endif
-			{
-				assert((format.bpp[plane] * format.align_w_cpu) % 8 == 0);
-	            const bool is_primary_plane = (plane == 0 || !format.planes_contiguous);
-				if (is_primary_plane)
 				{
-					cpu_align = (format.bpp[plane] * format.align_w_cpu) / 8;
+					assert((format.bpp[plane] * format.align_w_cpu) % 8 == 0);
+					const bool is_primary_plane = (plane == 0 || !format.planes_contiguous);
+					if (is_primary_plane)
+					{
+						cpu_align = (format.bpp[plane] * format.align_w_cpu) / 8;
+					}
 				}
 			}
 
@@ -977,6 +980,16 @@ static int prepare_descriptor_exynos_formats(
 	return 0;
 }
 
+static bool validate_usage(const uint64_t usage) {
+	if (usage & GRALLOC_USAGE_FRONT_BUFFER) {
+		/* TODO(b/218383959): Enable front buffer rendering */
+		MALI_GRALLOC_LOGW("Front buffer rendering is disabled.");
+		return false;
+	}
+
+	return true;
+}
+
 int mali_gralloc_derive_format_and_size(buffer_descriptor_t * const bufDescriptor)
 {
 	alloc_type_t alloc_type{};
@@ -984,6 +997,11 @@ int mali_gralloc_derive_format_and_size(buffer_descriptor_t * const bufDescripto
 	int alloc_width = bufDescriptor->width;
 	int alloc_height = bufDescriptor->height;
 	uint64_t usage = bufDescriptor->producer_usage | bufDescriptor->consumer_usage;
+
+	if (!validate_usage(usage)) {
+		MALI_GRALLOC_LOGE("Usage flag validation failed.");
+		return -EINVAL;
+	}
 
 	/*
 	* Select optimal internal pixel format based upon
@@ -1048,6 +1066,7 @@ int mali_gralloc_derive_format_and_size(buffer_descriptor_t * const bufDescripto
 		                     usage & (GRALLOC_USAGE_SW_READ_MASK | GRALLOC_USAGE_SW_WRITE_MASK),
 		                     usage & ~(GRALLOC_USAGE_PRIVATE_MASK | GRALLOC_USAGE_SW_READ_MASK | GRALLOC_USAGE_SW_WRITE_MASK),
 		                     usage & (GRALLOC_USAGE_HW_TEXTURE | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_GPU_DATA_BUFFER),
+		                     usage & (GRALLOC_USAGE_HW_CAMERA_WRITE | GRALLOC_USAGE_HW_CAMERA_READ),
 		                     &bufDescriptor->pixel_stride,
 		                     &bufDescriptor->alloc_sizes[0],
 		                     bufDescriptor->plane_info);
