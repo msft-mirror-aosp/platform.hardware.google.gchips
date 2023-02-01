@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+#define ATRACE_TAG ATRACE_TAG_GRAPHICS
+
+#include <utils/Trace.h>
+
 #include "SharedMetadata.h"
 #include "Allocator.h"
 #include "core/mali_gralloc_bufferallocation.h"
@@ -38,6 +42,7 @@ void allocate(const buffer_descriptor_t &bufferDescriptor, uint32_t count, IAllo
 #if DISABLE_FRAMEBUFFER_HAL
 	GRALLOC_UNUSED(fb_allocator);
 #endif
+	ATRACE_CALL();
 
 	Error error = Error::NONE;
 	int stride = 0;
@@ -72,7 +77,17 @@ void allocate(const buffer_descriptor_t &bufferDescriptor, uint32_t count, IAllo
 			auto hnd = const_cast<private_handle_t *>(reinterpret_cast<const private_handle_t *>(tmpBuffer));
 			hnd->imapper_version = HIDL_MAPPER_VERSION_SCALED;
 
+			// 4k is rougly 7.9 MB with one byte per pixel. We are
+			// assuming that the reserved region might be needed for
+			// dynamic HDR and that represents the largest size.
+			uint64_t max_reserved_region_size = 8ull * 1024 * 1024;
 			hnd->reserved_region_size = bufferDescriptor.reserved_size;
+			if (hnd->reserved_region_size > max_reserved_region_size) {
+				MALI_GRALLOC_LOGE("%s, Requested reserved region size (%" PRIu64 ") is larger than allowed (%" PRIu64 ")",
+						__func__, hnd->reserved_region_size, max_reserved_region_size);
+				error = Error::BAD_VALUE;
+				break;
+			}
 			hnd->attr_size = mapper::common::shared_metadata_size() + hnd->reserved_region_size;
 
 			if (hnd->get_usage() & GRALLOC_USAGE_ROIINFO)
