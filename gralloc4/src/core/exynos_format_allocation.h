@@ -267,7 +267,7 @@ int setup_p010_sp(int width, int height, int fd_count, plane_info_t *plane)
 	return 2;
 }
 
-int setup_420_p(int width, int height, int fd_count, plane_info_t *plane)
+int setup_420_p(int width, int height, int fd_count, plane_info_t *plane, int c_align = 16)
 {
 	/* TODO: make this into an assert instead ? */
 	width = GRALLOC_ALIGN(width, 2);
@@ -279,7 +279,7 @@ int setup_420_p(int width, int height, int fd_count, plane_info_t *plane)
 	plane[0].byte_stride = width;
 	plane[0].fd_idx = 0;
 
-	int chroma_width = GRALLOC_ALIGN(width / 2, 16);
+	int chroma_width = GRALLOC_ALIGN(width / 2, c_align);
 	int chroma_height = height / 2;
 
 	plane[1].size = PLANE_SIZE(chroma_width, chroma_height);
