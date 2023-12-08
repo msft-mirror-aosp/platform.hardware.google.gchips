@@ -117,6 +117,7 @@ static std::string pop_descriptor_string(const frameworks_vec<uint8_t> &vec, siz
 	return str;
 }
 
+#if defined(GRALLOC_MAPPER_4)
 template <typename vecT, typename BufferDescriptorInfoT>
 static const frameworks_vec<vecT> grallocEncodeBufferDescriptor(const BufferDescriptorInfoT &descriptorInfo)
 {
@@ -186,6 +187,8 @@ static bool grallocDecodeBufferDescriptor(const frameworks_vec<vecT> &androidDes
 
 	return true;
 }
+
+#endif // GRALLOC_MAPPER_4
 
 } // namespace common
 } // namespace mapper
