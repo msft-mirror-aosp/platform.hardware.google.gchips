@@ -22,6 +22,7 @@
 #include <vector>
 #include <VendorVideoAPI.h>
 #include "gralloctypes/Gralloc4.h"
+#include <pixel-gralloc/metadata.h>
 
 namespace arm
 {
@@ -35,6 +36,7 @@ using aidl::android::hardware::graphics::common::Smpte2086;
 using aidl::android::hardware::graphics::common::Cta861_3;
 using aidl::android::hardware::graphics::common::BlendMode;
 using aidl::android::hardware::graphics::common::Dataspace;
+using ::pixel::graphics::VideoGMV;
 
 template <typename T>
 struct aligned_optional
@@ -100,6 +102,7 @@ struct aligned_inline_vector
 struct shared_metadata
 {
 	ExynosVideoMeta video_private_data;
+	pixel::graphics::VideoGMV video_gmv_data;
 
 	aligned_optional<BlendMode> blend_mode {};
 	aligned_optional<Rect> crop {};
