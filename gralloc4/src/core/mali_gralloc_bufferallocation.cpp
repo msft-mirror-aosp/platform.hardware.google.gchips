@@ -38,6 +38,7 @@
 #include "exynos_format_allocation.h"
 
 #define EXT_SIZE       256
+#define INVALID_USAGE  (((1LL * 0xFFFE) << 32))
 
 /* HW needs extra padding bytes for its prefetcher does not check the picture boundary */
 #define BW_EXT_SIZE (16 * 1024)
@@ -503,8 +504,13 @@ static bool validate_size(uint32_t layer_count, uint32_t width, uint32_t height)
 }
 
 static bool validate_descriptor(buffer_descriptor_t * const bufDescriptor) {
+	uint64_t usage = bufDescriptor->producer_usage | bufDescriptor->consumer_usage;
 	if (!log_obsolete_usage_flags(bufDescriptor->producer_usage | bufDescriptor->consumer_usage)) {
 		return false;
+	}
+
+	if (usage & INVALID_USAGE) {
+		return -EINVAL;
 	}
 
 	// BLOB formats are used for some ML models whose size can be really large (up to 2GB)
@@ -1027,7 +1033,6 @@ int mali_gralloc_derive_format_and_size(buffer_descriptor_t * const bufDescripto
 	if (!validate_descriptor(bufDescriptor)) {
 		return -EINVAL;
 	}
-
 	/*
 	* Select optimal internal pixel format based upon
 	* usage and requested format.
