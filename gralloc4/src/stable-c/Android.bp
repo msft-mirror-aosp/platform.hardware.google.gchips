@@ -48,12 +48,12 @@ cc_defaults {
         "libbase_headers",
         "libimapper_stablec",
         "libimapper_providerutils",
+        "pixel-gralloc-headers",
     ],
     cflags: [
         "-DLOG_TAG=\"gralloc5\"",
         "-DGRALLOC_VERSION_MAJOR=5",
     ],
-
 }
 
 cc_library_shared {
