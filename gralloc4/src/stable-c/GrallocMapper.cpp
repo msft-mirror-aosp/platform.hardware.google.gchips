@@ -18,6 +18,9 @@
 #include "GrallocMapper.h"
 
 #include <cutils/native_handle.h>
+#include <pixel-gralloc/mapper.h>
+#include <pixel-gralloc/metadata.h>
+#include <pixel-gralloc/utils.h>
 
 #include "allocator/mali_gralloc_ion.h"
 #include "core/format_info.h"
@@ -31,6 +34,8 @@ namespace arm {
 namespace mapper {
 
 using namespace android::hardware::graphics::mapper;
+using PixelMetadataType = ::pixel::graphics::MetadataType;
+
 
 AIMapper_Error GrallocMapper::importBuffer(const native_handle_t* _Nonnull handle,
                                            buffer_handle_t _Nullable* _Nonnull outBufferHandle) {
@@ -209,14 +214,46 @@ int32_t GrallocMapper::getStandardMetadata(buffer_handle_t _Nonnull buffer,
                                    outDataSize, provider);
 }
 
+bool isPixelMetadataType(common::MetadataType meta) {
+    return (meta.name == ::pixel::graphics::kPixelMetadataTypeName);
+}
+
+int32_t getPixelMetadataHelper(buffer_handle_t handle, const PixelMetadataType meta, void* outData,
+                               size_t outDataSize) {
+    switch (meta) {
+        case PixelMetadataType::VIDEO_HDR: {
+            auto result = pixel::graphics::utils::encode<PixelMetadataType::VIDEO_HDR>(
+                    common::get_video_hdr(static_cast<const private_handle_t*>(handle)));
+
+            outData = result.data();
+            outDataSize = result.size();
+            return -AIMapper_Error::AIMAPPER_ERROR_NONE;
+        }
+        case PixelMetadataType::VIDEO_ROI: {
+            auto result = pixel::graphics::utils::encode<PixelMetadataType::VIDEO_ROI>(
+                    common::get_video_roiinfo(static_cast<const private_handle_t*>(handle)));
+            outData = result.data();
+            outDataSize = result.size();
+            return -AIMapper_Error::AIMAPPER_ERROR_NONE;
+        }
+        default:
+            return -AIMapper_Error::AIMAPPER_ERROR_BAD_VALUE;
+    }
+}
+
 int32_t GrallocMapper::getMetadata(buffer_handle_t _Nonnull buffer,
                                    AIMapper_MetadataType metadataType, void* _Nonnull outData,
                                    size_t outDataSize) {
     if (buffer == nullptr) return -AIMapper_Error::AIMAPPER_ERROR_BAD_BUFFER;
+
     if (isStandardMetadataType(common::MetadataType(metadataType))) {
         return getStandardMetadata(buffer, metadataType.value, outData, outDataSize);
-    } else
+    } else if (isPixelMetadataType(common::MetadataType(metadataType))) {
+        const PixelMetadataType pixelMeta = static_cast<PixelMetadataType>(metadataType.value);
+        return getPixelMetadataHelper(buffer, pixelMeta, outData, outDataSize);
+    } else {
         return -AIMapper_Error::AIMAPPER_ERROR_UNSUPPORTED;
+    }
 }
 
 template <StandardMetadataType TYPE>
