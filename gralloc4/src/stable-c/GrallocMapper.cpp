@@ -222,7 +222,7 @@ int32_t getPixelMetadataHelper(buffer_handle_t handle, const PixelMetadataType m
                                size_t outDataSize) {
     switch (meta) {
         case PixelMetadataType::VIDEO_HDR: {
-            auto result = pixel::graphics::utils::encode<PixelMetadataType::VIDEO_HDR>(
+            auto result = ::pixel::graphics::utils::encode(
                     common::get_video_hdr(static_cast<const private_handle_t*>(handle)));
 
             outData = result.data();
@@ -230,7 +230,7 @@ int32_t getPixelMetadataHelper(buffer_handle_t handle, const PixelMetadataType m
             return -AIMapper_Error::AIMAPPER_ERROR_NONE;
         }
         case PixelMetadataType::VIDEO_ROI: {
-            auto result = pixel::graphics::utils::encode<PixelMetadataType::VIDEO_ROI>(
+            auto result = ::pixel::graphics::utils::encode(
                     common::get_video_roiinfo(static_cast<const private_handle_t*>(handle)));
             outData = result.data();
             outDataSize = result.size();
