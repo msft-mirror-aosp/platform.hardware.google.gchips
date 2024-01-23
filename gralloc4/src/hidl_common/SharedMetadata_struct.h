@@ -102,7 +102,7 @@ struct aligned_inline_vector
 struct shared_metadata
 {
 	ExynosVideoMeta video_private_data;
-	pixel::graphics::VideoGMV video_gmv_data;
+	VideoGMV video_gmv_data;
 
 	aligned_optional<BlendMode> blend_mode {};
 	aligned_optional<Rect> crop {};

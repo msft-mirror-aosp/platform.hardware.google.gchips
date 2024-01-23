@@ -70,6 +70,7 @@ android::status_t set_smpte2094_40(const private_handle_t *hnd, const std::optio
 void* get_video_hdr(const private_handle_t *hnd);
 
 void* get_video_roiinfo(const private_handle_t *hnd);
+
 VideoGMV get_video_gmv(const private_handle_t *hnd);
 android::status_t set_video_gmv(const private_handle_t *hnd, const VideoGMV &data);
 

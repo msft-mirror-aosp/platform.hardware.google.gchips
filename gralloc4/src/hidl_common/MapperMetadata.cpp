@@ -709,16 +709,17 @@ Error set_metadata(const private_handle_t *handle, const MetadataType &metadataT
 	}
 	else if (metadataType.name == ::pixel::graphics::kPixelMetadataTypeName)
 	{
-		/* None of the vendor types support set. */
 		switch (static_cast<::pixel::graphics::MetadataType>(metadataType.value))
 		{
 		case ::pixel::graphics::MetadataType::VIDEO_GMV:
 		{
 			auto gmv = ::pixel::graphics::utils::decode<VideoGMV>(metadata);
-			if (gmv.has_value())
+			if (!gmv.has_value())
 			{
-				err = set_video_gmv(handle, gmv.value());
+				MALI_GRALLOC_LOGE("Failed to decode VideoGMV");
+				return Error::BAD_VALUE;
 			}
+			err = set_video_gmv(handle, gmv.value());
 			break;
 		}
 		default:
