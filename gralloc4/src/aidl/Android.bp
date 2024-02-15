@@ -12,7 +12,6 @@ cc_library_shared {
     shared_libs: [
         "android.hardware.graphics.allocator-V1-ndk",
         "android.hardware.graphics.allocator@4.0",
-        "android.hardware.graphics.mapper@4.0",
         "libbinder_ndk",
     ],
     static_libs: [
@@ -25,6 +24,9 @@ cc_library_shared {
     ],
     include_dirs: [
         "hardware/google/gchips/include",
+    ],
+    cflags: [
+        "-DGRALLOC_MAPPER_4",
     ],
 }
 
