@@ -3,7 +3,8 @@ package {
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator-V1-service",
+    name: "pixel_gralloc_allocator",
+    stem: "android.hardware.graphics.allocator-V1-service",
     proprietary: true,
     relative_install_path: "hw",
     srcs: [
