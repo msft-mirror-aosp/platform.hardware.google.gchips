@@ -7,7 +7,10 @@ cc_library_shared {
     proprietary: true,
     relative_install_path: "hw",
     defaults: [
-        "arm_gralloc_api_4x_defaults",
+        "arm_gralloc_api_defaults",
+        "arm_gralloc_defaults",
+        "arm_gralloc_version_defaults",
+
     ],
     shared_libs: [
         "android.hardware.graphics.allocator-V1-ndk",
@@ -19,14 +22,10 @@ cc_library_shared {
     ],
     srcs: [
         "GrallocAllocator.cpp",
-        ":libgralloc_hidl_common_allocator",
         ":libgralloc_hidl_common_shared_metadata",
+        ":libgralloc_hidl_common_allocator",
     ],
     include_dirs: [
         "hardware/google/gchips/include",
     ],
-    cflags: [
-        "-DGRALLOC_MAPPER_4",
-    ],
 }
-
