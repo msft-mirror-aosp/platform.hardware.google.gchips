@@ -58,6 +58,9 @@ libvendorgraphicbuffer_cc_defaults {
 			mapper4: {
 				srcs: ["gralloc4/vendor_graphicbuffer_meta.cpp"],
 			},
+			conditions_default: {
+				srcs: ["gralloc4/vendor_graphicbuffer_meta.cpp"],
+			},
 		},
 	},
 }
