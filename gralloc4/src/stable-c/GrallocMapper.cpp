@@ -225,16 +225,16 @@ int32_t getPixelMetadataHelper(buffer_handle_t handle, const PixelMetadataType m
             auto result = ::pixel::graphics::utils::encode(
                     common::get_video_hdr(static_cast<const private_handle_t*>(handle)));
 
-            outData = result.data();
-            outDataSize = result.size();
-            return -AIMapper_Error::AIMAPPER_ERROR_NONE;
+            if (result.size() <= outDataSize)
+                std::memcpy(outData, result.data(), result.size());
+            return result.size();
         }
         case PixelMetadataType::VIDEO_ROI: {
             auto result = ::pixel::graphics::utils::encode(
                     common::get_video_roiinfo(static_cast<const private_handle_t*>(handle)));
-            outData = result.data();
-            outDataSize = result.size();
-            return -AIMapper_Error::AIMAPPER_ERROR_NONE;
+            if (result.size() <= outDataSize)
+                std::memcpy(outData, result.data(), result.size());
+            return result.size();
         }
         default:
             return -AIMapper_Error::AIMAPPER_ERROR_BAD_VALUE;
