@@ -20,55 +20,14 @@ package {
 }
 
 cc_defaults {
-    name: "arm_gralloc_version_stablec_defaults",
-    cflags: [
-        "-DGRALLOC_VERSION_MAJOR=5",
-        "-DHIDL_MAPPER_VERSION_SCALED=500",
-        "-DLOG_TAG=\"gralloc5\"",
-        "-DGRALLOC_MAPPER_5",
-    ],
-}
-
-cc_defaults {
-    name: "arm_gralloc_api_stablec_defaults",
+    name: "gralloc_mapper5_defaults",
     defaults: [
+        "arm_gralloc_api_defaults",
         "arm_gralloc_defaults",
-        "arm_gralloc_version_stablec_defaults",
+        "arm_gralloc_version_defaults",
     ],
     relative_install_path: "hw/",
-    shared_libs: [
-        "libhardware",
-        "liblog",
-        "android.hardware.graphics.common@1.2",
-        "libcutils",
-        "libdmabufheap",
-        "libsync",
-        "libutils",
-        "libnativewindow",
-        "libgralloctypes",
-    ],
-    static_libs: [
-        "libarect",
-        "libgralloc_core",
-        "libgralloc_allocator",
-        "libgralloc_capabilities",
-        "libdrm",
-    ],
-    header_libs: [
-        "libnativebase_headers",
-        "libbase_headers",
-        "libimapper_stablec",
-        "libimapper_providerutils",
-        "pixel-gralloc-headers",
-    ],
-}
-
-cc_library_shared {
-    name: "mapper.pixel",
-    defaults: [
-        "arm_gralloc_api_stablec_defaults",
-    ],
-    vintf_fragments: ["manifest.xml"],
+    vintf_fragments: ["stable-c/manifest.xml"],
     static_libs: [
         "libgralloc_drmutils",
     ],
@@ -78,7 +37,7 @@ cc_library_shared {
         "libcutils",
     ],
     srcs: [
-        "GrallocMapper.cpp",
+        "stable-c/GrallocMapper.cpp",
         ":libgralloc_hidl_common_mapper",
         ":libgralloc_hidl_common_mapper_metadata",
         ":libgralloc_hidl_common_shared_metadata",

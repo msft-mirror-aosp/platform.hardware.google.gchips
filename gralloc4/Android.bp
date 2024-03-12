@@ -72,6 +72,33 @@ soong_config_string_variable {
 	],
 }
 
+soong_config_module_type {
+    name: "gralloc_defaults",
+    module_type: "cc_defaults",
+    config_namespace: "arm_gralloc",
+    variables: [
+        "mapper_version",
+    ],
+    properties: [
+        "srcs",
+        "target",
+        "cflags",
+        "shared_libs",
+        "static_libs",
+        "header_libs",
+        "defaults",
+        "stem",
+    ],
+}
+
+soong_config_string_variable {
+    name: "mapper_version",
+    values: [
+        "mapper4",
+        "mapper5",
+    ],
+}
+
 arm_gralloc_cc_defaults {
 	name: "arm_gralloc_defaults",
 	owner: "arm",
