@@ -246,6 +246,13 @@ int32_t getPixelMetadataHelper(buffer_handle_t handle, const PixelMetadataType m
                 std::memcpy(outData, result.data(), result.size());
             return result.size();
         }
+        case PixelMetadataType::VIDEO_GMV: {
+            auto result = ::pixel::graphics::utils::encode(
+                    common::get_video_gmv(static_cast<const private_handle_t*>(handle)));
+            if (result.size() <= outDataSize) std::memcpy(outData, result.data(), result.size());
+            return result.size();
+        }
+
         default:
             return -AIMapper_Error::AIMAPPER_ERROR_BAD_VALUE;
     }
@@ -329,12 +336,29 @@ AIMapper_Error GrallocMapper::setStandardMetadata(buffer_handle_t _Nonnull buffe
     return applyStandardMetadata(standardMeta, metadata, metadataSize, applier);
 }
 
+AIMapper_Error setPixelMetadata(buffer_handle_t handle, const PixelMetadataType meta,
+                                const void* metadata, size_t metadataSize) {
+    if (meta == PixelMetadataType::VIDEO_GMV) {
+        std::vector<uint8_t> in_data(metadataSize);
+        std::memcpy(in_data.data(), metadata, metadataSize);
+        auto gmv = ::pixel::graphics::utils::decode<common::VideoGMV>(in_data);
+        if (!gmv.has_value()) return AIMapper_Error::AIMAPPER_ERROR_BAD_VALUE;
+        auto result =
+                common::set_video_gmv(static_cast<const private_handle_t*>(handle), gmv.value());
+        if (result == android::OK) return AIMapper_Error::AIMAPPER_ERROR_NONE;
+    }
+    return AIMapper_Error::AIMAPPER_ERROR_BAD_VALUE;
+}
+
 AIMapper_Error GrallocMapper::setMetadata(buffer_handle_t _Nonnull buffer,
                                           AIMapper_MetadataType metadataType,
                                           const void* _Nonnull metadata, size_t metadataSize) {
     if (buffer == nullptr) return AIMapper_Error::AIMAPPER_ERROR_BAD_BUFFER;
     if (isStandardMetadataType(common::MetadataType(metadataType))) {
         return setStandardMetadata(buffer, metadataType.value, metadata, metadataSize);
+    } else if (isPixelMetadataType(common::MetadataType(metadataType))) {
+        const PixelMetadataType pixelMeta = static_cast<PixelMetadataType>(metadataType.value);
+        return setPixelMetadata(buffer, pixelMeta, metadata, metadataSize);
     } else
         return AIMapper_Error::AIMAPPER_ERROR_NONE;
 }
