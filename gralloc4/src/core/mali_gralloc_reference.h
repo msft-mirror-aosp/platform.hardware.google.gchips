@@ -29,5 +29,7 @@ int mali_gralloc_reference_map(buffer_handle_t handle);
 
 std::optional<void*> mali_gralloc_reference_get_buf_addr(buffer_handle_t handle);
 std::optional<void*> mali_gralloc_reference_get_metadata_addr(buffer_handle_t handle);
+int mali_gralloc_reference_lock_retain(buffer_handle_t handle);
+int mali_gralloc_reference_lock_release(buffer_handle_t handle);
 
 #endif /* MALI_GRALLOC_REFERENCE_H_ */
