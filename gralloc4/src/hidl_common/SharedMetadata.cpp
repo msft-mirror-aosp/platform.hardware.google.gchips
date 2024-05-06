@@ -174,6 +174,18 @@ void* get_video_roiinfo(const private_handle_t *hnd) {
 	auto *metadata = static_cast<char*>(mali_gralloc_reference_get_metadata_addr(hnd).value());
 	return metadata + sizeof(shared_metadata) + hnd->reserved_region_size;
 }
+
+VideoGMV get_video_gmv(const private_handle_t *hnd) {
+	auto *metadata = reinterpret_cast<shared_metadata *>(mali_gralloc_reference_get_metadata_addr(hnd).value());
+	return metadata->video_gmv_data;
+}
+
+android::status_t set_video_gmv(const private_handle_t *hnd, const VideoGMV &data) {
+	auto *metadata = reinterpret_cast<shared_metadata *>(mali_gralloc_reference_get_metadata_addr(hnd).value());
+	metadata->video_gmv_data = data;
+	return android::OK;
+}
+
 } // namespace common
 } // namespace mapper
 } // namespace arm
