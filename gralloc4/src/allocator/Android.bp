@@ -51,6 +51,7 @@ arm_gralloc_allocator_cc_defaults {
 	name: "arm_gralloc_allocator_defaults",
 	defaults: [
 		"arm_gralloc_defaults",
+		"android.hardware.graphics.common-ndk_shared",
 	],
 	soong_config_variables: {
 		gralloc_use_ion_dma_heap: {
@@ -76,7 +77,6 @@ arm_gralloc_allocator_cc_defaults {
 	},
 	srcs: [
 		"mali_gralloc_ion.cpp",
-		"mali_gralloc_shared_memory.cpp",
 	],
 	static_libs: [
 		"libarect",
@@ -86,11 +86,9 @@ arm_gralloc_allocator_cc_defaults {
 		"liblog",
 		"libcutils",
 		"libdmabufheap",
-		"libion_google",
 		"libsync",
 		"libutils",
 		"libnativewindow",
-		"android.hardware.graphics.common-V4-ndk",
 	],
 	header_libs: [
 		"libnativebase_headers",

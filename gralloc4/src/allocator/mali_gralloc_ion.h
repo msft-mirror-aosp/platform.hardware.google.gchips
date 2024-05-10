@@ -24,17 +24,14 @@
 int mali_gralloc_ion_allocate_attr(private_handle_t *hnd);
 int mali_gralloc_ion_allocate(const gralloc_buffer_descriptor_t *descriptors,
                               uint32_t numDescriptors, buffer_handle_t *pHandle, bool *alloc_from_backing_store,
-                              int ion_fd = -1);
+                              bool use_placeholder = false);
 void mali_gralloc_ion_free(private_handle_t * const hnd);
 int mali_gralloc_ion_sync_start(const private_handle_t * const hnd,
                                 const bool read, const bool write);
 int mali_gralloc_ion_sync_end(const private_handle_t * const hnd,
                               const bool read, const bool write);
-int mali_gralloc_ion_map(private_handle_t *hnd);
-void mali_gralloc_ion_unmap(private_handle_t *hnd);
-void mali_gralloc_ion_close(void);
+std::array<void*, MAX_BUFFER_FDS> mali_gralloc_ion_map(private_handle_t *hnd);
+void mali_gralloc_ion_unmap(private_handle_t *hnd, std::array<void*, MAX_BUFFER_FDS>& vaddrs);
 int mali_gralloc_attr_allocate(void);
-int import_exynos_ion_handles(private_handle_t *hnd);
-void free_exynos_ion_handles(private_handle_t *hnd);
 
 #endif /* MALI_GRALLOC_ION_H_ */

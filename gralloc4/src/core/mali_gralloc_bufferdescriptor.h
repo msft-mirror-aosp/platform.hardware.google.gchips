@@ -51,7 +51,7 @@ struct buffer_descriptor_t
 	 * allocate the buffer.
 	 */
 	uint64_t alloc_sizes[MAX_PLANES];
-	int pixel_stride;
+	uint64_t pixel_stride;
 	uint64_t alloc_format;
 	uint32_t fd_count;
 	uint32_t plane_count;
@@ -66,7 +66,6 @@ struct buffer_descriptor_t
 	    hal_format(0),
 	    layer_count(0),
 	    format_type(MALI_GRALLOC_FORMAT_TYPE_USAGE),
-	    name("Unnamed"),
 	    reserved_size(0),
 	    pixel_stride(0),
 	    alloc_format(0),
@@ -87,11 +86,11 @@ struct buffer_descriptor_t
 			"name(%s)"
 			"reserved_size(%" PRIu64 ") "
 			"alloc_sizes(%" PRIu64 ", %" PRIu64 ", %" PRIu64 ")"
-			"pixel_stride(%d) alloc_format(0x%" PRIx64 ") fd_count(%d) "
+			"pixel_stride(%" PRIu64 ") alloc_format(0x%" PRIx64 ") fd_count(%d) "
 			"plane_count(%u) "
-			"plane[0](offset %" PRId64 ", idx %u, size %" PRIu64 " byte_stride %u, wh %u %u)"
-			"plane[1](offset %" PRId64 ", idx %u, size %" PRIu64 " byte_stride %u, wh %u %u)"
-			"plane[2](offset %" PRId64 ", idx %u, size %" PRIu64 " byte_stride %u, wh %u %u)"
+			"plane[0](offset %" PRId64 ", idx %u, size %" PRIu64 " byte_stride %" PRIu64 ", wh %" PRIu64 " %" PRIu64 ")"
+			"plane[1](offset %" PRId64 ", idx %u, size %" PRIu64 " byte_stride %" PRIu64 ", wh %" PRIu64 " %" PRIu64 ")"
+			"plane[2](offset %" PRId64 ", idx %u, size %" PRIu64 " byte_stride %" PRIu64 ", wh %" PRIu64 " %" PRIu64 ")"
 			"\n",
 			str.c_str(),
 			width, height,

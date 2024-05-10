@@ -50,7 +50,6 @@ cc_defaults {
 		"liblog",
 		"libcutils",
 		"libdmabufheap",
-		"libion_google",
 		"libsync",
 		"libutils",
 		"libnativewindow",
@@ -92,5 +91,8 @@ cc_library_shared {
 	],
 	include_dirs: [
 		"hardware/google/gchips/include",
+	],
+	cflags: [
+		"-DGRALLOC_MAPPER_4=1",
 	],
 }

@@ -35,6 +35,7 @@ soong_config_module_type {
 		"gralloc_hwc_force_bgra_8888",
 		"gralloc_hwc_fb_disable_afbc",
 		"gralloc_camera_write_raw16",
+		"soc"
 	],
 	properties: [
 		"cflags",
@@ -62,6 +63,15 @@ soong_config_bool_variable {
 	name: "gralloc_camera_write_raw16",
 }
 
+soong_config_string_variable {
+	name: "soc",
+	values: [
+		"gs101",
+		"gs201",
+		"zuma",
+	],
+}
+
 arm_gralloc_cc_defaults {
 	name: "arm_gralloc_defaults",
 	owner: "arm",
@@ -83,6 +93,7 @@ arm_gralloc_cc_defaults {
 	},
 	header_libs: [
 		"libgralloc_headers",
+		"pixel-gralloc-headers",
 	],
 	target: {
 		android: {
@@ -138,6 +149,13 @@ arm_gralloc_cc_defaults {
 			cflags: [
 				"-DGRALLOC_CAMERA_WRITE_RAW16=1",
 			],
+		},
+		soc: {
+			zuma: {
+				cflags: [
+					"-DSOC_ZUMA"
+				],
+			},
 		},
 	},
 }

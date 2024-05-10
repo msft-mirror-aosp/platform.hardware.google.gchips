@@ -25,7 +25,11 @@
 #include "mali_gralloc_formats.h"
 #include "hidl_common/SharedMetadata.h"
 #include "hidl_common/SharedMetadata_struct.h"
+#include "hidl_common/hidl_common.h"
 #include "exynos_format.h"
+
+#include <pixel-gralloc/metadata.h>
+#include <pixel-gralloc/mapper.h>
 
 using namespace android;
 using namespace vendor::graphics;
@@ -34,8 +38,11 @@ using arm::mapper::common::shared_metadata;
 using aidl::android::hardware::graphics::common::Dataspace;
 using android::gralloc4::encodeDataspace;
 using android::gralloc4::decodeDataspace;
+using android::gralloc4::decodePixelFormatFourCC;
+using android::gralloc4::decodePixelFormatModifier;
 using android::hardware::graphics::mapper::V4_0::IMapper;
 using android::hardware::graphics::mapper::V4_0::Error;
+using MapperMetadataType = android::hardware::graphics::mapper::V4_0::IMapper::MetadataType;
 
 #define UNUSED(x) ((void)x)
 #define SZ_4k 0x1000
@@ -45,8 +52,7 @@ using android::hardware::graphics::mapper::V4_0::Error;
 // libraries and should depend upon HAL (and it's extension) to call into
 // Gralloc.
 int mali_gralloc_reference_validate(buffer_handle_t handle) {
-	auto hnd = static_cast<const private_handle_t *>(handle);
-  return private_handle_t::validate(hnd);
+	return private_handle_t::validate(handle);
 }
 
 const private_handle_t * convertNativeHandleToPrivateHandle(buffer_handle_t handle) {
@@ -68,19 +74,10 @@ android::sp<IMapper> get_mapper() {
 	return mapper;
 }
 
-int VendorGraphicBufferMeta::get_video_metadata_fd(buffer_handle_t hnd)
+int VendorGraphicBufferMeta::get_video_metadata_fd(buffer_handle_t /*hnd*/)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
-
-	if (!gralloc_hnd)
-		return -EINVAL;
-
-	uint64_t usage = gralloc_hnd->producer_usage | gralloc_hnd->consumer_usage;
-
-	if (usage & VendorGraphicBufferUsage::VIDEO_PRIVATE_DATA)
-		return gralloc_hnd->get_share_attr_fd();
-	else
-		return -EINVAL;
+	ALOGE("%s function is obsolete and should not be used", __FUNCTION__);
+	__builtin_trap();
 }
 
 int VendorGraphicBufferMeta::get_dataspace(buffer_handle_t hnd)
@@ -136,7 +133,7 @@ int VendorGraphicBufferMeta::set_dataspace(buffer_handle_t hnd, android_dataspac
 
 int VendorGraphicBufferMeta::is_afbc(buffer_handle_t hnd)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
 
 	if (!gralloc_hnd)
 		return 0;
@@ -147,11 +144,9 @@ int VendorGraphicBufferMeta::is_afbc(buffer_handle_t hnd)
 	return 0;
 }
 
-int VendorGraphicBufferMeta::is_sbwc(buffer_handle_t buffer_hnd_p)
+int VendorGraphicBufferMeta::is_sbwc(buffer_handle_t hnd)
 {
-	const private_handle_t *hnd = static_cast<const private_handle_t *>(buffer_hnd_p);
-
-	return is_sbwc_format(static_cast<uint32_t>(hnd->alloc_format & MALI_GRALLOC_INTFMT_FMT_MASK));
+	return is_sbwc_format(VendorGraphicBufferMeta::get_internal_format(hnd));
 }
 
 #define GRALLOC_META_GETTER(__type__, __name__, __member__) \
@@ -165,7 +160,8 @@ __type__ VendorGraphicBufferMeta::get_##__name__(buffer_handle_t hnd) \
 
 uint32_t VendorGraphicBufferMeta::get_format(buffer_handle_t hnd)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
+
 	if (!gralloc_hnd)
 		return 0;
 
@@ -174,7 +170,8 @@ uint32_t VendorGraphicBufferMeta::get_format(buffer_handle_t hnd)
 
 uint64_t VendorGraphicBufferMeta::get_internal_format(buffer_handle_t hnd)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);;
+
 	if (!gralloc_hnd)
 		return 0;
 
@@ -186,6 +183,7 @@ GRALLOC_META_GETTER(uint64_t, frameworkFormat, req_format);
 GRALLOC_META_GETTER(int, width, width);
 GRALLOC_META_GETTER(int, height, height);
 GRALLOC_META_GETTER(uint32_t, stride, stride);
+GRALLOC_META_GETTER(uint32_t, stride_in_bytes, plane_info[0].byte_stride);
 GRALLOC_META_GETTER(uint32_t, vstride, plane_info[0].alloc_height);
 
 GRALLOC_META_GETTER(uint64_t, producer_usage, producer_usage);
@@ -196,7 +194,7 @@ GRALLOC_META_GETTER(uint64_t, flags, flags);
 
 int VendorGraphicBufferMeta::get_fd(buffer_handle_t hnd, int num)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
 
 	if (!gralloc_hnd)
 		return -1;
@@ -209,7 +207,7 @@ int VendorGraphicBufferMeta::get_fd(buffer_handle_t hnd, int num)
 
 int VendorGraphicBufferMeta::get_size(buffer_handle_t hnd, int num)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
 
 	if (!gralloc_hnd)
 		return 0;
@@ -223,7 +221,7 @@ int VendorGraphicBufferMeta::get_size(buffer_handle_t hnd, int num)
 
 uint64_t VendorGraphicBufferMeta::get_usage(buffer_handle_t hnd)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(hnd);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
 
 	if (!gralloc_hnd)
 		return 0;
@@ -231,33 +229,107 @@ uint64_t VendorGraphicBufferMeta::get_usage(buffer_handle_t hnd)
 	return gralloc_hnd->producer_usage | gralloc_hnd->consumer_usage;
 }
 
+void* decodePointer(const android::hardware::hidl_vec<uint8_t>& tmpVec) {
+	constexpr uint8_t kPtrSize = sizeof(void*);
+	assert(tmpVec.size() == kPtrSize);
+
+	void* data_ptr;
+	std::memcpy(&data_ptr, tmpVec.data(), kPtrSize);
+
+	return data_ptr;
+}
+
 void* VendorGraphicBufferMeta::get_video_metadata(buffer_handle_t hnd)
 {
-	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
-
-	if (gralloc_hnd == nullptr)
+	native_handle_t* handle = const_cast<native_handle_t*>(hnd);
+	if (!handle) {
 		return nullptr;
+	}
 
-	return gralloc_hnd->attr_base;
+	using namespace ::pixel::graphics;
+	auto out_oe = mapper::get<MetadataType::VIDEO_HDR>(handle);
+
+	if (!out_oe.has_value()) {
+		ALOGE("Failed to get video HDR metadata");
+		return nullptr;
+	}
+
+	return out_oe.value();
 }
 
 void* VendorGraphicBufferMeta::get_video_metadata_roiinfo(buffer_handle_t hnd)
 {
-	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(hnd);
-
-	if (gralloc_hnd == nullptr)
+	native_handle_t* handle = const_cast<native_handle_t*>(hnd);
+	if (!handle) {
 		return nullptr;
+	}
 
-	if (gralloc_hnd->get_usage() & VendorGraphicBufferUsage::ROIINFO)
-		return static_cast<char*>(gralloc_hnd->attr_base) +
-			sizeof(shared_metadata) + gralloc_hnd->reserved_region_size;
+	using namespace ::pixel::graphics;
+	auto out_oe = mapper::get<MetadataType::VIDEO_ROI>(handle);
 
-	return nullptr;
+	if (!out_oe.has_value()) {
+		ALOGE("Failed to get video ROI metadata");
+		return nullptr;
+	}
+
+	return out_oe.value();
+}
+
+uint32_t VendorGraphicBufferMeta::get_format_fourcc(buffer_handle_t hnd) {
+	native_handle_t* handle = const_cast<native_handle_t*>(hnd);
+	if (!handle) {
+		return DRM_FORMAT_INVALID;
+	}
+
+	Error error = Error::NONE;
+	uint32_t fourcc;
+	get_mapper()->get(handle, android::gralloc4::MetadataType_PixelFormatFourCC,
+	                  [&](const auto& tmpError, const android::hardware::hidl_vec<uint8_t>& tmpVec) {
+	                  	error = tmpError;
+	                  	if (error != Error::NONE) {
+	                  		return;
+	                  	}
+	                  	error = static_cast<Error>(decodePixelFormatFourCC(tmpVec, &fourcc));
+	                  });
+
+
+	if (error != Error::NONE) {
+		ALOGE("Failed to get fourcc");
+		return DRM_FORMAT_INVALID;
+	}
+
+	return fourcc;
+}
+
+uint64_t VendorGraphicBufferMeta::get_format_modifier(buffer_handle_t hnd) {
+	native_handle_t* handle = const_cast<native_handle_t*>(hnd);
+	if (!handle) {
+		return DRM_FORMAT_MOD_INVALID;
+	}
+
+	Error error = Error::NONE;
+	uint64_t modifier;
+	get_mapper()->get(handle, android::gralloc4::MetadataType_PixelFormatModifier,
+	                  [&](const auto& tmpError, const android::hardware::hidl_vec<uint8_t>& tmpVec) {
+	                  	error = tmpError;
+	                  	if (error != Error::NONE) {
+	                  		return;
+	                  	}
+	                  	error = static_cast<Error>(decodePixelFormatModifier(tmpVec, &modifier));
+	                  });
+
+
+	if (error != Error::NONE) {
+		ALOGE("Failed to get format modifier");
+		return DRM_FORMAT_MOD_INVALID;
+	}
+
+	return modifier;
 }
 
 void VendorGraphicBufferMeta::init(const buffer_handle_t handle)
 {
-	const private_handle_t *gralloc_hnd = static_cast<const private_handle_t *>(handle);
+	const auto *gralloc_hnd = convertNativeHandleToPrivateHandle(handle);
 
 	if (!gralloc_hnd)
 		return;
