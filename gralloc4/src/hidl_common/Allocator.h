@@ -18,12 +18,15 @@
 #ifndef GRALLOC_COMMON_ALLOCATOR_H
 #define GRALLOC_COMMON_ALLOCATOR_H
 
-#include "4.x/gralloc_allocator_hidl_header.h"
 
 #include <functional>
 
 #include "core/mali_gralloc_bufferdescriptor.h"
 #include "BufferDescriptor.h"
+#include <android/hardware/graphics/allocator/4.0/IAllocator.h>
+
+using android::hardware::graphics::allocator::V4_0::IAllocator;
+using android::hardware::graphics::mapper::V4_0::Error;
 
 namespace arm
 {
@@ -53,6 +56,10 @@ using android::hardware::hidl_vec;
  */
 void allocate(const buffer_descriptor_t &bufferDescriptor, uint32_t count, IAllocator::allocate_cb hidl_cb,
               std::function<int(const buffer_descriptor_t *, buffer_handle_t *)> fb_allocator = nullptr);
+
+const std::string dump();
+
+bool isSupported(buffer_descriptor_t *const bufDescriptor);
 
 } // namespace common
 } // namespace allocator

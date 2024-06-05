@@ -23,13 +23,11 @@
 #include <vector>
 #include "gralloctypes/Gralloc4.h"
 #include "mali_gralloc_buffer.h"
-#include "allocator/mali_gralloc_shared_memory.h"
 #include "core/mali_gralloc_bufferdescriptor.h"
 #include "gralloc_helper.h"
 
-#include "4.x/gralloc_mapper_hidl_header.h"
-
 #include "SharedMetadata_struct.h"
+#include "pixel-gralloc/metadata.h"
 
 namespace arm
 {
@@ -44,6 +42,7 @@ using aidl::android::hardware::graphics::common::Smpte2086;
 using aidl::android::hardware::graphics::common::Cta861_3;
 using aidl::android::hardware::graphics::common::BlendMode;
 using aidl::android::hardware::graphics::common::Dataspace;
+using ::pixel::graphics::VideoGMV;
 
 void shared_metadata_init(void *memory, std::string_view name);
 size_t shared_metadata_size();
@@ -67,6 +66,13 @@ android::status_t set_cta861_3(const private_handle_t *hnd, const std::optional<
 
 void get_smpte2094_40(const private_handle_t *hnd, std::optional<std::vector<uint8_t>> *smpte2094_40);
 android::status_t set_smpte2094_40(const private_handle_t *hnd, const std::optional<std::vector<uint8_t>> &smpte2094_40);
+
+void* get_video_hdr(const private_handle_t *hnd);
+
+void* get_video_roiinfo(const private_handle_t *hnd);
+
+VideoGMV get_video_gmv(const private_handle_t *hnd);
+android::status_t set_video_gmv(const private_handle_t *hnd, const VideoGMV &data);
 
 } // namespace common
 } // namespace mapper

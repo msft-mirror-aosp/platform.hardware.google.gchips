@@ -19,36 +19,31 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-cc_library_static {
-    name: "libgralloc_drmutils",
-    defaults: ["android.hardware.graphics.common-ndk_shared"],
-    cflags: [
-        "-Wall",
-        "-Werror",
+cc_defaults {
+    name: "gralloc_mapper5_defaults",
+    defaults: [
+        "arm_gralloc_api_defaults",
+        "arm_gralloc_defaults",
+        "arm_gralloc_version_defaults",
     ],
-    srcs: [
-        "src/drmutils.cpp",
+    relative_install_path: "hw/",
+    vintf_fragments: ["stable-c/manifest.xml"],
+    static_libs: [
+        "libgralloc_drmutils",
     ],
-    vendor: true,
     shared_libs: [
-        "liblog",
-        "libdrm",
+        "arm.graphics-V1-ndk",
+        "libhidlbase",
         "libcutils",
     ],
-    header_libs: [
-        "libgralloc_headers",
+    srcs: [
+        "stable-c/GrallocMapper.cpp",
+        ":libgralloc_hidl_common_mapper",
+        ":libgralloc_hidl_common_mapper_metadata",
+        ":libgralloc_hidl_common_shared_metadata",
     ],
     include_dirs: [
-        ".",
         "hardware/google/gchips/include",
     ],
-    export_include_dirs: [
-        ".",
-    ],
-    export_shared_lib_headers: [
-        "libdrm",
-    ],
-    export_header_lib_headers: [
-        "libgralloc_headers",
-    ],
+    cpp_std: "c++20",
 }
