@@ -42,6 +42,7 @@ buffer_handle_t RegisteredHandlePool::get(const void* buffer)
 
 bool RegisteredHandlePool::isRegistered(buffer_handle_t buffer)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return (bufPool.find(buffer) != bufPool.end());
 }
 
