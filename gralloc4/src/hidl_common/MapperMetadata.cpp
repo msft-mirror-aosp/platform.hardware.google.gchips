@@ -598,6 +598,12 @@ Error get_metadata(const private_handle_t *handle, const MetadataType &metadataT
 				vec = ::pixel::graphics::utils::encode(plane_fds);
 				break;
 			}
+			case ::pixel::graphics::MetadataType::VIDEO_GMV:
+			{
+				auto gmv = get_video_gmv(handle);
+				vec = ::pixel::graphics::utils::encode(gmv);
+				break;
+			}
 			default:
 				err = android::BAD_VALUE;
 		}
@@ -613,9 +619,9 @@ Error get_metadata(const private_handle_t *handle, const MetadataType &metadataT
 
 Error set_metadata(const private_handle_t *handle, const MetadataType &metadataType, const frameworks_vec<uint8_t> &metadata)
 {
+	android::status_t err = android::OK;
 	if (isStandardMetadataType(metadataType))
 	{
-		android::status_t err = android::OK;
 		switch (static_cast<StandardMetadataType>(metadataType.value))
 		{
 		case StandardMetadataType::DATASPACE:
@@ -700,13 +706,31 @@ Error set_metadata(const private_handle_t *handle, const MetadataType &metadataT
 		default:
 			return Error::UNSUPPORTED;
 		}
-		return ((err) ? Error::UNSUPPORTED : Error::NONE);
+	}
+	else if (metadataType.name == ::pixel::graphics::kPixelMetadataTypeName)
+	{
+		switch (static_cast<::pixel::graphics::MetadataType>(metadataType.value))
+		{
+		case ::pixel::graphics::MetadataType::VIDEO_GMV:
+		{
+			auto gmv = ::pixel::graphics::utils::decode<VideoGMV>(metadata);
+			if (!gmv.has_value())
+			{
+				MALI_GRALLOC_LOGE("Failed to decode VideoGMV");
+				return Error::BAD_VALUE;
+			}
+			err = set_video_gmv(handle, gmv.value());
+			break;
+		}
+		default:
+			return Error::UNSUPPORTED;
+		}
 	}
 	else
 	{
-		/* None of the vendor types support set. */
-		return Error::UNSUPPORTED;
+		err = android::BAD_VALUE;
 	}
+	return (err ? Error::UNSUPPORTED : Error::NONE);
 }
 
 #ifdef GRALLOC_MAPPER_4
