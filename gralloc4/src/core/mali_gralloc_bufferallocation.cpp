@@ -52,6 +52,7 @@
 #define BIG_BYTE_ALIGN_DEFAULT 64
 #ifdef SOC_ZUMA
 #define CAMERA_RAW_BUFFER_BYTE_ALIGN 32
+#define CAMERA_YUV_BUFFER_BYTE_ALIGN 64
 #endif
 
 /* Realign YV12 format so that chroma stride is half of luma stride */
@@ -659,6 +660,11 @@ static void calc_allocation_size(const int width,
 				 * Camera ISP requires RAW buffers to have 32-byte aligned stride
 				 */
 				hw_align = std::max(hw_align, static_cast<uint32_t>(CAMERA_RAW_BUFFER_BYTE_ALIGN));
+			}
+
+			if (has_camera_usage && format.is_yuv) {
+				/* Camera ISP requires YUV buffers to have 64-byte aligned stride */
+				hw_align = lcm(hw_align, static_cast<uint32_t>(CAMERA_YUV_BUFFER_BYTE_ALIGN));
 			}
 #endif
 

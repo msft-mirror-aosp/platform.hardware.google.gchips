@@ -43,6 +43,7 @@ private:
         size_t metadata_size;
 
         uint64_t ref_count = 0;
+        uint64_t locked_ref_count = 0;
     };
 
     BufferManager() = default;
@@ -224,6 +225,27 @@ private:
     }
 
 public:
+    int buffer_lock_retain(buffer_handle_t buf) EXCLUDES(lock) {
+        std::lock_guard<std::mutex> _l(lock);
+        private_handle_t *hnd =
+                reinterpret_cast<private_handle_t *>(const_cast<native_handle *>(buf));
+        auto it = buffer_map.find(hnd);
+        if (it == buffer_map.end()) return -EINVAL;
+        it->second->locked_ref_count++;
+        return 0;
+    }
+
+    int buffer_lock_release(buffer_handle_t buf) EXCLUDES(lock) {
+        std::lock_guard<std::mutex> _l(lock);
+        private_handle_t *hnd =
+                reinterpret_cast<private_handle_t *>(const_cast<native_handle *>(buf));
+        auto it = buffer_map.find(hnd);
+        if (it == buffer_map.end()) return -EINVAL;
+        if (it->second->locked_ref_count == 0) return -EINVAL;
+
+        it->second->locked_ref_count--;
+        return 0;
+    }
     static BufferManager &getInstance() {
         static BufferManager instance;
         return instance;
@@ -370,4 +392,12 @@ std::optional<void *> mali_gralloc_reference_get_buf_addr(buffer_handle_t handle
 
 std::optional<void *> mali_gralloc_reference_get_metadata_addr(buffer_handle_t handle) {
     return BufferManager::getInstance().get_metadata_addr(handle);
+}
+
+int mali_gralloc_reference_lock_retain(buffer_handle_t handle) {
+    return BufferManager::getInstance().buffer_lock_retain(handle);
+}
+
+int mali_gralloc_reference_lock_release(buffer_handle_t handle) {
+    return BufferManager::getInstance().buffer_lock_release(handle);
 }

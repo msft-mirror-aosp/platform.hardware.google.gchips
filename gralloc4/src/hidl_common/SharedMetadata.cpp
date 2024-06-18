@@ -101,11 +101,6 @@ void get_smpte2086(const private_handle_t *hnd, std::optional<Smpte2086> *smpte2
 
 android::status_t set_smpte2086(const private_handle_t *hnd, const std::optional<Smpte2086> &smpte2086)
 {
-	if (!smpte2086.has_value())
-	{
-		return android::BAD_VALUE;
-	}
-
 	auto *metadata = reinterpret_cast<shared_metadata *>(mali_gralloc_reference_get_metadata_addr(hnd).value());
 	metadata->smpte2086 = aligned_optional(smpte2086);
 
@@ -120,11 +115,6 @@ void get_cta861_3(const private_handle_t *hnd, std::optional<Cta861_3> *cta861_3
 
 android::status_t set_cta861_3(const private_handle_t *hnd, const std::optional<Cta861_3> &cta861_3)
 {
-	if (!cta861_3.has_value())
-	{
-		return android::BAD_VALUE;
-	}
-
 	auto *metadata = reinterpret_cast<shared_metadata *>(mali_gralloc_reference_get_metadata_addr(hnd).value());
 	metadata->cta861_3 = aligned_optional(cta861_3);
 
