@@ -93,6 +93,6 @@ cc_library_shared {
 		"hardware/google/gchips/include",
 	],
 	cflags: [
-		"-DGRALLOC_MAPPER_4=1",
+		"-DGRALLOC_MAPPER_4",
 	],
 }
