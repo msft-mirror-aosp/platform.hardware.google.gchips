@@ -247,7 +247,7 @@ public:
         return 0;
     }
     static BufferManager &getInstance() {
-        static BufferManager instance;
+        [[clang::no_destroy]] static BufferManager instance;
         return instance;
     }
 
