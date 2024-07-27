@@ -69,6 +69,7 @@ cc_library_shared {
 	name: "libvendorgraphicbuffer",
 	defaults: [
 		"libvendorgraphicbuffer_src_defaults",
+		"pixel-gralloc-headers-dependencies",
 	],
 	shared_libs: [
 		"libdrm",
