@@ -246,8 +246,7 @@ void* VendorGraphicBufferMeta::get_video_metadata(buffer_handle_t hnd)
 		return nullptr;
 	}
 
-	using namespace ::pixel::graphics;
-	auto out_oe = mapper::get<MetadataType::VIDEO_HDR>(handle);
+	auto out_oe = ::pixel::graphics::mapper::get<::pixel::graphics::MetadataType::VIDEO_HDR>(handle);
 
 	if (!out_oe.has_value()) {
 		ALOGE("Failed to get video HDR metadata");
@@ -264,8 +263,7 @@ void* VendorGraphicBufferMeta::get_video_metadata_roiinfo(buffer_handle_t hnd)
 		return nullptr;
 	}
 
-	using namespace ::pixel::graphics;
-	auto out_oe = mapper::get<MetadataType::VIDEO_ROI>(handle);
+	auto out_oe = ::pixel::graphics::mapper::get<::pixel::graphics::MetadataType::VIDEO_ROI>(handle);
 
 	if (!out_oe.has_value()) {
 		ALOGE("Failed to get video ROI metadata");
