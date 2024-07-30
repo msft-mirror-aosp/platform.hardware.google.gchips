@@ -35,6 +35,15 @@
     }                                                           \
 }
 
+/* Check array boundary before use it */
+#define CHECK_ARRAY_BOUNDARY(array_size, limit_size) {          \
+    if ((array_size) > (limit_size)) {                          \
+        ALOGE("[%s][%d] array size(%d) > limit size (%d)",      \
+              __func__, __LINE__, (array_size), (limit_size));  \
+        return -1;                                              \
+    }                                                           \
+}
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -444,6 +453,8 @@ int Exynos_parsing_user_data_registered_itu_t_t35 (
         extraByte   = 0;
         extraBit    = bit_offset % 8;
         data        = (extraBit != 0) ? (data >> (8 - extraBit)) : data;
+
+        CHECK_ARRAY_BOUNDARY(data, 25); // max value is 25
         pHdr10PlusInfo->data.num_rows_targeted_system_display_actual_peak_luminance = data;
         num_rows_targeted_system_display_actual_peak_luminance = data;
         data = 0;
@@ -468,6 +479,8 @@ int Exynos_parsing_user_data_registered_itu_t_t35 (
         extraByte   = 0;
         extraBit    = bit_offset % 8;
         data        = (extraBit != 0) ? (data >> (8 - extraBit)) : data;
+
+        CHECK_ARRAY_BOUNDARY(data, 25); // max value is 25
         pHdr10PlusInfo->data.num_cols_targeted_system_display_actual_peak_luminance = data;
         num_cols_targeted_system_display_actual_peak_luminance = data;
         data = 0;
@@ -673,6 +686,8 @@ int Exynos_parsing_user_data_registered_itu_t_t35 (
         extraByte   = 0;
         extraBit    = bit_offset % 8;
         data        = (extraBit != 0) ? (data >> (8 - extraBit)) : data;
+
+        CHECK_ARRAY_BOUNDARY(data, 25); // max value is 25
         pHdr10PlusInfo->data.num_rows_mastering_display_actual_peak_luminance = data;
         num_rows_mastering_display_actual_peak_luminance = data;
         data = 0;
@@ -697,6 +712,8 @@ int Exynos_parsing_user_data_registered_itu_t_t35 (
         extraByte   = 0;
         extraBit    = bit_offset % 8;
         data        = (extraBit != 0) ? (data >> (8 - extraBit)) : data;
+
+        CHECK_ARRAY_BOUNDARY(data, 25); // max value is 25
         pHdr10PlusInfo->data.num_cols_mastering_display_actual_peak_luminance = data;
         num_cols_mastering_display_actual_peak_luminance = data;
         data = 0;
