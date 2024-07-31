@@ -43,7 +43,10 @@ gralloc_defaults {
 
 cc_library_shared {
     name: "pixel_gralloc_mapper",
-    defaults: ["gralloc_mapper_defaults"],
+    defaults: [
+        "gralloc_mapper_defaults",
+        "pixel-gralloc-headers-dependencies",
+    ],
 }
 
 gralloc_defaults {
