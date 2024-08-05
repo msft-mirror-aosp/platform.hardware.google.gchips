@@ -195,7 +195,6 @@ int32_t getPixelMetadataHelper(const private_handle_t *handle, const PixelMetada
 	switch (meta) {
 	case PixelMetadataType::VIDEO_HDR: {
 		auto result = ::pixel::graphics::utils::encode(common::get_video_hdr(handle));
-
 		if (result.size() <= outDataSize) std::memcpy(outData, result.data(), result.size());
 		return result.size();
 	}
@@ -209,7 +208,15 @@ int32_t getPixelMetadataHelper(const private_handle_t *handle, const PixelMetada
 		if (result.size() <= outDataSize) std::memcpy(outData, result.data(), result.size());
 		return result.size();
 	}
-
+	case PixelMetadataType::PLANE_DMA_BUFS: {
+		std::vector<int> plane_fds(MAX_BUFFER_FDS, -1);
+		for (int i = 0; i < get_num_planes(handle); i++) {
+			plane_fds[i] = handle->fds[handle->plane_info[i].fd_idx];
+		}
+		auto result = ::pixel::graphics::utils::encode(plane_fds);
+		if (result.size() <= outDataSize) std::memcpy(outData, result.data(), result.size());
+		return result.size();
+	}
 	default:
 		return -AIMapper_Error::AIMAPPER_ERROR_BAD_VALUE;
 	}
