@@ -2,7 +2,7 @@ soong_namespace {
     imports: [
         "hardware/google/graphics/common",
         "hardware/google/gchips/gralloc4",
-    ]
+    ],
 }
 
 package {
@@ -41,3 +41,9 @@ cc_library_headers {
 }
 
 subdirs = ["*"]
+
+cc_library_headers {
+    name: "gchips_headers",
+    export_include_dirs: ["include"],
+    proprietary: true,
+}
