@@ -25,6 +25,10 @@ cc_defaults {
         "arm_gralloc_api_defaults",
         "arm_gralloc_defaults",
         "arm_gralloc_version_defaults",
+        "pixel-gralloc-headers-dependencies",
+    ],
+    header_libs: [
+        "pixel-gralloc-headers",
     ],
     relative_install_path: "hw/",
     vintf_fragments: ["stable-c/manifest.xml"],
