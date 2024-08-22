@@ -119,10 +119,6 @@ int validate_lock_input_parameters(const buffer_handle_t buffer, const int l,
 	 * This is because codec2 attempts to lock with wrong access region.
 	 * Ask Google to fix codec2
 	 */
-
-	 if (((hnd->producer_usage | hnd->consumer_usage) & usage) == 0) {
-		  return -EINVAL;
-	 }
 	if (hnd->get_alloc_format() != HAL_PIXEL_FORMAT_BLOB)
 	{
 		if ((l < 0) || (t < 0) || (w < 0) || (h < 0))
