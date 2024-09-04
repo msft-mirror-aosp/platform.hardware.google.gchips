@@ -28,6 +28,9 @@
 #include "hidl_common.h"
 #include "mali_gralloc_error.h"
 
+#include <pixel-gralloc/metadata.h>
+#include <pixel-gralloc/utils.h>
+
 namespace arm
 {
 namespace mapper
@@ -39,6 +42,8 @@ namespace common
 using aidl::android::hardware::graphics::common::Rect;
 
 using android::hardware::Void;
+
+using PixelMetadataType = ::pixel::graphics::MetadataType;
 
 class GrallocRect {
 	public:
@@ -68,6 +73,9 @@ class GrallocRect {
 	}
 #endif // GRALLOC_MAPPER_4 or GRALLOC_MAPPER_5
 };
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnullability-completeness"
 
 /**
  * Imports a raw buffer handle to create an imported buffer handle for use with
@@ -278,6 +286,13 @@ std::vector<BufferDump> dumpBuffers();
  */
 Error getReservedRegion(buffer_handle_t buffer, void **outReservedRegion, uint64_t &outReservedSize);
 
+int32_t getStandardMetadata(const private_handle_t *handle, StandardMetadataType metadata_type,
+                            void *outData, size_t outDataSize);
+
+int32_t getPixelMetadataHelper(const private_handle_t *handle, const PixelMetadataType meta,
+                               void *_Nullable outData, size_t outDataSize);
+
+#pragma GCC diagnostic pop
 } // namespace common
 } // namespace mapper
 } // namespace arm
