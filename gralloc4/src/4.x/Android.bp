@@ -26,6 +26,7 @@ cc_defaults {
 		"arm_gralloc_defaults",
 		"arm_gralloc_version_defaults",
 	],
+	vintf_fragments: ["4.x/manifest.xml"],
 	relative_install_path: "hw/",
 	export_shared_lib_headers: [
 		"libhidlbase",
