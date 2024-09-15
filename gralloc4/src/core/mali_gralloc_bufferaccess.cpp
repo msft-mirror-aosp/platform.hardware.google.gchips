@@ -233,25 +233,21 @@ int mali_gralloc_lock(buffer_handle_t buffer,
 		*vaddr = buf_addr.value();
 
 		buffer_sync(hnd, get_tx_direction(usage));
+		return mali_gralloc_reference_lock_retain(buffer);
 	}
 
 	return 0;
+
 }
 
 
 /*
  *  Unlocks the given buffer.
  *
- * @param m           [in]   Gralloc module.
  * @param buffer      [in]   The buffer to unlock.
  *
  * @return 0, when the locking is successful;
  *         Appropriate error, otherwise
- *
- * Note: unlocking a buffer which is not locked results in an unexpected behaviour.
- *       Though it is possible to create a state machine to track the buffer state to
- *       recognize erroneous conditions, it is expected of client to adhere to API
- *       call sequence
  */
 int mali_gralloc_unlock(buffer_handle_t buffer)
 {
@@ -264,5 +260,5 @@ int mali_gralloc_unlock(buffer_handle_t buffer)
 	private_handle_t *hnd = (private_handle_t *)buffer;
 	buffer_sync(hnd, TX_NONE);
 
-	return 0;
+	return mali_gralloc_reference_lock_release(buffer);
 }

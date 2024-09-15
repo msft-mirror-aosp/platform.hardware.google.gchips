@@ -52,6 +52,7 @@
 #define BIG_BYTE_ALIGN_DEFAULT 64
 #ifdef SOC_ZUMA
 #define CAMERA_RAW_BUFFER_BYTE_ALIGN 32
+#define CAMERA_YUV_BUFFER_BYTE_ALIGN 64
 #endif
 
 /* Realign YV12 format so that chroma stride is half of luma stride */
@@ -244,7 +245,7 @@ bool get_alloc_type(const uint64_t format_ext,
  * Width and height should already be AFBC aligned.
  */
 void init_afbc(uint8_t *buf, const uint64_t alloc_format,
-               const bool is_multi_plane,
+               const bool is_multi_plane, uint8_t bpp,
                const uint64_t w, const uint64_t h)
 {
 	ATRACE_CALL();
@@ -264,7 +265,8 @@ void init_afbc(uint8_t *buf, const uint64_t alloc_format,
 		{ (uint32_t)body_offset, 0x1, 0x10000, 0x0 }, /* Layouts 0, 3, 4, 7 */
 		{ ((uint32_t)body_offset + (1 << 28)), 0x80200040, 0x1004000, 0x20080 } /* Layouts 1, 5 */
 	};
-	if ((alloc_format & MALI_GRALLOC_INTFMT_AFBC_TILED_HEADERS))
+
+	if (is_tiled)
 	{
 		/* Zero out body_offset for non-subsampled formats. */
 		memset(headers[0], 0, sizeof(size_t) * 4);
@@ -286,13 +288,19 @@ void init_afbc(uint8_t *buf, const uint64_t alloc_format,
 	 */
 	const uint32_t layout = is_subsampled_yuv(base_format) && !is_multi_plane ? 1 : 0;
 
-	MALI_GRALLOC_LOGV("Writing AFBC header layout %d for format (%s %" PRIx32 ")",
-		layout, format_name(base_format), base_format);
+	/* We initialize only linear layouts*/
+	const size_t sb_bytes = is_tiled? 0 : GRALLOC_ALIGN((bpp * AFBC_PIXELS_PER_BLOCK) / 8, 128);
+
+	MALI_GRALLOC_LOGV("Writing AFBC header layout %d for format (%s %" PRIx32 ", n_headers: %d, "
+		"body_offset: %" PRIx32 ", is_tiled %d, sb_bytes: %zu",
+		layout, format_name(base_format), base_format,
+		n_headers, body_offset, is_tiled, sb_bytes);
 
 	for (uint32_t i = 0; i < n_headers; i++)
 	{
 		memcpy(buf, headers[layout], sizeof(headers[layout]));
 		buf += sizeof(headers[layout]);
+		headers[layout][0] += sb_bytes;
 	}
 }
 
@@ -659,6 +667,11 @@ static void calc_allocation_size(const int width,
 				 * Camera ISP requires RAW buffers to have 32-byte aligned stride
 				 */
 				hw_align = std::max(hw_align, static_cast<uint32_t>(CAMERA_RAW_BUFFER_BYTE_ALIGN));
+			}
+
+			if (has_camera_usage && format.is_yuv) {
+				/* Camera ISP requires YUV buffers to have 64-byte aligned stride */
+				hw_align = lcm(hw_align, static_cast<uint32_t>(CAMERA_YUV_BUFFER_BYTE_ALIGN));
 			}
 #endif
 
