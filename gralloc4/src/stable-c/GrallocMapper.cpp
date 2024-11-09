@@ -20,7 +20,7 @@
 #include <cutils/native_handle.h>
 #include <pixel-gralloc/mapper.h>
 #include <pixel-gralloc/metadata.h>
-#include <pixel-gralloc/utils.h>
+#include <pixel-gralloc/utils-internal.h>
 
 #include "allocator/mali_gralloc_ion.h"
 #include "core/format_info.h"
