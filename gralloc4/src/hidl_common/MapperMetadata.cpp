@@ -29,7 +29,7 @@
 #include "mali_gralloc_formats.h"
 
 #include <pixel-gralloc/metadata.h>
-#include <pixel-gralloc/utils.h>
+#include <pixel-gralloc/utils-internal.h>
 
 #include <vector>
 
