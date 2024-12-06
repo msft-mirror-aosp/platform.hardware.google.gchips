@@ -29,7 +29,7 @@
 #include "mali_gralloc_error.h"
 
 #include <pixel-gralloc/metadata.h>
-#include <pixel-gralloc/utils.h>
+#include <pixel-gralloc/utils-internal.h>
 
 namespace arm
 {
