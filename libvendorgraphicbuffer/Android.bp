@@ -22,7 +22,7 @@ package {
 soong_config_module_type {
 	name: "libvendorgraphicbuffer_cc_defaults",
 	module_type: "cc_defaults",
-	config_namespace: "arm_gralloc",
+	config_namespace: "pixel_gralloc",
 	variables: [
 		"mapper_version",
 	],
@@ -69,6 +69,7 @@ cc_library_shared {
 	name: "libvendorgraphicbuffer",
 	defaults: [
 		"libvendorgraphicbuffer_src_defaults",
+		"pixel-gralloc-headers-dependencies",
 	],
 	shared_libs: [
 		"libdrm",
