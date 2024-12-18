@@ -1,4 +1,5 @@
-#define LOG_TAG "gralloc-V1-service"
+#undef LOG_TAG
+#define LOG_TAG "gralloc-allocator"
 
 #include <android/binder_ibinder_platform.h>
 #include <android/binder_manager.h>
@@ -6,7 +7,11 @@
 #include <android/binder_status.h>
 #include <log/log.h>
 
+#if defined(GRALLOC_MAPPER_4)
 #include "aidl/GrallocAllocator.h"
+#elif defined (GRALLOC_MAPPER_5)
+#include "aidl/GrallocAllocator2.h"
+#endif
 
 using namespace android;
 
@@ -16,6 +21,7 @@ int main() {
     auto service = ndk::SharedRefBase::make<GrallocAllocator>();
     auto binder = service->asBinder();
 
+    AIBinder_setInheritRt(binder.get(), true);
     AIBinder_setMinSchedulerPolicy(binder.get(), SCHED_NORMAL, -20);
 
     const auto instance = std::string() + GrallocAllocator::descriptor + "/default";

@@ -155,8 +155,12 @@ int validate_lock_input_parameters(const buffer_handle_t buffer, const int l,
 		return GRALLOC1_ERROR_UNSUPPORTED;
 	}
 
-	/* Producer and consumer usage is verified in gralloc1 specific code. */
-	GRALLOC_UNUSED(usage);
+	/* Verify that we're locking a buffer that is used by CPU. */
+	if ((usage & (GRALLOC_USAGE_SW_READ_MASK | GRALLOC_USAGE_SW_WRITE_MASK)) == 0) {
+		MALI_GRALLOC_LOGE("Attempt to lock buffer %p with not-cpu usage (%s 0x%" PRIx64 ")",
+			buffer, describe_usage(usage).c_str(), usage);
+		return -EINVAL;
+	}
 
 	return 0;
 }
@@ -233,8 +237,8 @@ int mali_gralloc_lock(buffer_handle_t buffer,
 		*vaddr = buf_addr.value();
 
 		buffer_sync(hnd, get_tx_direction(usage));
+		return mali_gralloc_reference_lock_retain(buffer);
 	}
-
 	return 0;
 }
 
@@ -242,16 +246,10 @@ int mali_gralloc_lock(buffer_handle_t buffer,
 /*
  *  Unlocks the given buffer.
  *
- * @param m           [in]   Gralloc module.
  * @param buffer      [in]   The buffer to unlock.
  *
  * @return 0, when the locking is successful;
  *         Appropriate error, otherwise
- *
- * Note: unlocking a buffer which is not locked results in an unexpected behaviour.
- *       Though it is possible to create a state machine to track the buffer state to
- *       recognize erroneous conditions, it is expected of client to adhere to API
- *       call sequence
  */
 int mali_gralloc_unlock(buffer_handle_t buffer)
 {
@@ -264,5 +262,5 @@ int mali_gralloc_unlock(buffer_handle_t buffer)
 	private_handle_t *hnd = (private_handle_t *)buffer;
 	buffer_sync(hnd, TX_NONE);
 
-	return 0;
+	return mali_gralloc_reference_lock_release(buffer);
 }

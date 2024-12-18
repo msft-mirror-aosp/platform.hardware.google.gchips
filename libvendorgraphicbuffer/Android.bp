@@ -19,10 +19,57 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
+soong_config_module_type {
+	name: "libvendorgraphicbuffer_cc_defaults",
+	module_type: "cc_defaults",
+	config_namespace: "pixel_gralloc",
+	variables: [
+		"mapper_version",
+	],
+	properties: [
+		"srcs",
+		"shared_libs",
+		"header_libs",
+	],
+}
+
+soong_config_string_variable {
+	name: "mapper_version",
+	values: [
+		"mapper4",
+		"mapper5",
+	],
+}
+
+libvendorgraphicbuffer_cc_defaults {
+	name: "libvendorgraphicbuffer_src_defaults",
+	soong_config_variables: {
+		mapper_version: {
+			mapper5: {
+				srcs: ["gralloc5/vendor_graphicbuffer_meta.cpp"],
+				shared_libs: [
+					"libvndksupport",
+				],
+				header_libs: [
+					"libimapper_providerutils",
+					"libimapper_stablec",
+				],
+			},
+			mapper4: {
+				srcs: ["gralloc4/vendor_graphicbuffer_meta.cpp"],
+			},
+			conditions_default: {
+				srcs: ["gralloc4/vendor_graphicbuffer_meta.cpp"],
+			},
+		},
+	},
+}
+
 cc_library_shared {
 	name: "libvendorgraphicbuffer",
-	srcs: [
-		"gralloc4/vendor_graphicbuffer_meta.cpp",
+	defaults: [
+		"libvendorgraphicbuffer_src_defaults",
+		"pixel-gralloc-headers-dependencies",
 	],
 	shared_libs: [
 		"libdrm",
