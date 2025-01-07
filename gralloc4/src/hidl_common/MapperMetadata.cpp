@@ -280,6 +280,8 @@ static std::vector<std::vector<PlaneLayoutComponent>> plane_layout_components_fr
 			return {{{RAW, 0, -1}}};
 		case HAL_PIXEL_FORMAT_BLOB:
 			break;
+		case HAL_PIXEL_FORMAT_Y8:
+			return {{{Y, 0, 8}}};
 		default:
 			MALI_GRALLOC_LOGW("Could not find component description for Format(%#x) FourCC value(%#x)",
 				hnd->get_alloc_format(), drm_fourcc);
