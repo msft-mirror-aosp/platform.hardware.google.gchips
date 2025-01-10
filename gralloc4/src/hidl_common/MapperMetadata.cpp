@@ -67,6 +67,7 @@ int get_num_planes(const private_handle_t *hnd)
 		{
 			case HAL_PIXEL_FORMAT_YCrCb_420_SP:
 			case HAL_PIXEL_FORMAT_EXYNOS_YV12_M:
+			case HAL_PIXEL_FORMAT_EXYNOS_YV12N:
 			case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_P:
 			case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_P_M:
 				return 3;
