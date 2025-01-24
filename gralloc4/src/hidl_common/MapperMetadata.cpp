@@ -607,6 +607,12 @@ Error get_metadata(const private_handle_t *handle, const MetadataType &metadataT
 				vec = ::pixel::graphics::utils::encode(gmv);
 				break;
 			}
+			case ::pixel::graphics::MetadataType::PIXEL_FORMAT_ALLOCATED:
+			{
+				auto internal_format = get_pixel_format_allocated(handle);
+				vec = ::pixel::graphics::utils::encode(internal_format);
+				break;
+			}
 			default:
 				err = android::BAD_VALUE;
 		}

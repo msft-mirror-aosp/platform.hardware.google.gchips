@@ -74,6 +74,7 @@ void* get_video_roiinfo(const private_handle_t *hnd);
 VideoGMV get_video_gmv(const private_handle_t *hnd);
 android::status_t set_video_gmv(const private_handle_t *hnd, const VideoGMV &data);
 
+int32_t get_pixel_format_allocated(const private_handle_t *hnd);
 } // namespace common
 } // namespace mapper
 } // namespace arm

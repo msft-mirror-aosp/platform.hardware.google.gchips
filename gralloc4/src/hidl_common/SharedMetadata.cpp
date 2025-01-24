@@ -176,6 +176,10 @@ android::status_t set_video_gmv(const private_handle_t *hnd, const VideoGMV &dat
 	return android::OK;
 }
 
+int32_t get_pixel_format_allocated(const private_handle_t *hnd) {
+	return static_cast<int32_t>(hnd->get_alloc_format());
+}
+
 } // namespace common
 } // namespace mapper
 } // namespace arm
