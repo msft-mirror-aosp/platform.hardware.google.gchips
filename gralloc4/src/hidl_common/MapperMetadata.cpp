@@ -67,6 +67,7 @@ int get_num_planes(const private_handle_t *hnd)
 		{
 			case HAL_PIXEL_FORMAT_YCrCb_420_SP:
 			case HAL_PIXEL_FORMAT_EXYNOS_YV12_M:
+			case HAL_PIXEL_FORMAT_EXYNOS_YV12N:
 			case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_P:
 			case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_P_M:
 				return 3;
@@ -279,6 +280,8 @@ static std::vector<std::vector<PlaneLayoutComponent>> plane_layout_components_fr
 			return {{{RAW, 0, -1}}};
 		case HAL_PIXEL_FORMAT_BLOB:
 			break;
+		case HAL_PIXEL_FORMAT_Y8:
+			return {{{Y, 0, 8}}};
 		default:
 			MALI_GRALLOC_LOGW("Could not find component description for Format(%#x) FourCC value(%#x)",
 				hnd->get_alloc_format(), drm_fourcc);
@@ -602,6 +605,12 @@ Error get_metadata(const private_handle_t *handle, const MetadataType &metadataT
 			{
 				auto gmv = get_video_gmv(handle);
 				vec = ::pixel::graphics::utils::encode(gmv);
+				break;
+			}
+			case ::pixel::graphics::MetadataType::PIXEL_FORMAT_ALLOCATED:
+			{
+				auto internal_format = get_pixel_format_allocated(handle);
+				vec = ::pixel::graphics::utils::encode(internal_format);
 				break;
 			}
 			default:

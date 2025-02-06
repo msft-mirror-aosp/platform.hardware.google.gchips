@@ -919,6 +919,12 @@ static int prepare_descriptor_exynos_formats(
 			plane_count = setup_420_p(w, h, fd_count, bufDescriptor->plane_info);
 			break;
 
+		case HAL_PIXEL_FORMAT_EXYNOS_YV12N:
+			w = GRALLOC_ALIGN(w, 64);
+			h = GRALLOC_ALIGN(h, 16);
+			plane_count = setup_420_p(w, h, fd_count, bufDescriptor->plane_info, 64);
+			break;
+
 		case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_TILED:
 			w = GRALLOC_ALIGN(w, 16);
 			h = GRALLOC_ALIGN(h, 32);

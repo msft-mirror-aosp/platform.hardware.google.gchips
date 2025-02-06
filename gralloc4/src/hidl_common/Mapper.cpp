@@ -193,6 +193,13 @@ int32_t getStandardMetadataHelper(const private_handle_t *hnd, F &&provide,
 int32_t getPixelMetadataHelper(const private_handle_t *handle, const PixelMetadataType meta,
 			       void *outData, size_t outDataSize) {
 	switch (meta) {
+	case PixelMetadataType::PIXEL_FORMAT_ALLOCATED: {
+		auto result = ::pixel::graphics::utils::encode(
+				common::get_pixel_format_allocated(handle));
+		if (result.size() <= outDataSize)
+			std::memcpy(outData, result.data(), result.size());
+		return result.size();
+	}
 	case PixelMetadataType::VIDEO_HDR: {
 		auto result = ::pixel::graphics::utils::encode(common::get_video_hdr(handle));
 		if (result.size() <= outDataSize) std::memcpy(outData, result.data(), result.size());
